@@ -76,7 +76,7 @@ class ScriptRunner:
             ScriptRunnerPaths.CONVERT,
         ]:
             self.scripts.update({directory.stem: list()})
-            for file in directory.glob("*/__main__.py"):
+            for file in directory.glob("*/check_nickname.py"):
                 self.scripts[directory.stem].append(file)
         return self.scripts
 

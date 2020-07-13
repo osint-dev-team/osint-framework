@@ -12,8 +12,8 @@ from src.core.runner.runner import ScriptRunner
 if __name__ == "__main__":
     runner = ScriptRunner()
     runner.run_category(
-        category="other",
-        username="johndoe",
+        category="osint",
+        username="admin",
         email="johndoe@gmail.com",
         fullname="John Doe",
     )
