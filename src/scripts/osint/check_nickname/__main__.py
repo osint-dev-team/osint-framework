@@ -12,7 +12,7 @@ class networks:
         with open("./src/scripts/osint/check_nickname/social_networks.txt") as f:
             self.net = [str(i).strip() for i in f.readlines()]
 
-#for the black times i wrote sync
+#for the black times i wrote sync :)
 
 def check_nickname_sync(nickname) -> str:
     """
