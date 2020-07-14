@@ -9,10 +9,12 @@ from time import sleep
 
 class networks:
     def __init__(self):
-        with open("social_networks.txt") as f:
+        with open("./src/scripts/osint/check_nickname/social_networks.txt") as f:
             self.net = [str(i).strip() for i in f.readlines()]
 
-def check_nickname_sync(nickname) -> list:
+#for the black times i wrote sync
+
+def check_nickname_sync(nickname) -> str:
     """
     checks nicknames from social networks(sync)
     :param nickname: just nickname :)
@@ -27,12 +29,12 @@ def check_nickname_sync(nickname) -> list:
             s = requests.Session()
             r = s.get(url)
             if(r.status_code == 200):
-                ans.append({url, nickname})
+                ans.append(url)
         except:
             print("ERROR!!!!!")
     return ans
 
-async def check_nickname_async(nickname,social) -> list:
+async def check_nickname_async(nickname,social) -> str:
     """
     checks nicknames from social networks(async)
     :param nickname: just nickname :)
@@ -46,7 +48,7 @@ async def check_nickname_async(nickname,social) -> list:
             try:
                 async with s.get(url) as r:
                     if(r.status == 200):
-                        ans.append({url, nickname})
+                        ans.append(url)
             except:
                 print("ERROR!!!!")
     return ans
@@ -54,30 +56,32 @@ async def check_nickname_async(nickname,social) -> list:
 class Runner(BaseRunner):
     def __init__(self, logger: str = __name__):
         super().__init__()
-
-    async def run(self, *args, **kwargs):
+    async def __run(self,*args,**kwargs):
         try:
             username = kwargs.get("username")
             social = asyncio.Queue()
             for i in networks().net:
                 await social.put("https://" + i + username)
-            result = await asyncio.gather(
-            asyncio.create_task(check_nickname_async(username,social)),
-            asyncio.create_task(check_nickname_async(username,social)),
-            asyncio.create_task(check_nickname_async(username,social)))
+            temp_result = await asyncio.gather(
+                *[asyncio.create_task(check_nickname_async(username, social)) for i in range(10)])
+            temp_temp_result = []
+            for i in temp_result:
+                for j in i:
+                    temp_temp_result.append(j)
+            result = {username : temp_temp_result}
             return ScriptResponse.success(
                 result=result,
                 message="yeah"
             )
-
         except Exception as err:
             return ScriptResponse.error(message=str(err))
+    def run(self, *args, **kwargs):
+        return asyncio.run(self.__run(username="admin"))
 
-if __name__ =="__main__":
+
+"""if __name__ =="__main__":
     srcipt_module = Runner()
     srcipt_result = asyncio.run(srcipt_module.run(username="admin"))
     print(srcipt_result)
-""" #print(check_nickname_sync(debug))
-    print("################################################################")
-    ans=asyncio.run(check_nickname_async(debug))
-    print(ans)  """
+"""
+
