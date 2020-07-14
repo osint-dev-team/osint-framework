@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
-from src.core.base.osint import BaseRunner, PossibleKeys
+from src.core.base.osint import OsintRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
 from src.core.utils.validators import validate_kwargs
 
 
-class Runner(BaseRunner):
+class Runner(OsintRunner):
     """
     Basic example
     """
+
     def __init__(self, logger: str = __name__):
         """
         Re-init base class instance
@@ -24,6 +25,4 @@ class Runner(BaseRunner):
         :param kwargs: kwargs
         :return: ScriptResponse message
         """
-        return ScriptResponse.success(
-            message="Script finished"
-        )
+        return ScriptResponse.success(message="Script finished")
