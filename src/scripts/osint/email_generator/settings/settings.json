@@ -1,0 +1,9 @@
+{
+  "nameBase":"settings/namebase.txt.gz",
+  "domenBase":"settings/domenbase.txt",
+  "serviceSymbols":
+  [
+    "-","_",".",""
+  ],
+  "domenBaseSize":673
+}
