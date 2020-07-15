@@ -4,7 +4,7 @@ import aiohttp
 import asyncio
 from src.core.utils.log import Logger
 from src.core.utils.response import ScriptResponse
-from src.core.base.osint import BaseRunner
+from src.core.base.osint import OsintRunner
 from time import sleep
 
 class networks:
@@ -53,7 +53,7 @@ async def check_nickname_async(nickname,social) -> str:
                 print("ERROR!!!!")
     return ans
 
-class Runner(BaseRunner):
+class Runner(OsintRunner):
     def __init__(self, logger: str = __name__):
         super().__init__()
     async def __run(self,*args,**kwargs):
