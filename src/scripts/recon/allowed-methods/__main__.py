@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from requests import request
-from requests.exceptions import ConnectionError
+from requests.exceptions import *
 
 from src.core.base.recon import ReconRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
@@ -72,7 +72,7 @@ class Runner(ReconRunner):
                     forbidden_methods.append(method)
                 else:
                     filtered_methods.append((method, status))
-            except ConnectionError:
+            except RequestException:
                 pass
 
         return ScriptResponse.success(
