@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
+
 import requests
 import aiohttp
 import asyncio
-from src.core.utils.log import Logger
 from src.core.utils.response import ScriptResponse
 from src.core.base.osint import OsintRunner
-from time import sleep
 
-class networks:
+
+class Networks:
     def __init__(self):
         with open("./src/scripts/osint/check_nickname/social_networks.txt") as f:
             self.net = [str(i).strip() for i in f.readlines()]
 
-#for the black times i wrote sync :)
 
-def check_nickname_sync(nickname) -> str:
+def check_nickname_sync(nickname: str) -> str:
     """
     checks nicknames from social networks(sync)
     :param nickname: just nickname :)
@@ -22,19 +21,19 @@ def check_nickname_sync(nickname) -> str:
      networks which have this nickname
     """
     ans = []
-    social = networks().net
-    for i in social:
+    social = Networks().net
+    for site in social:
         try:
-            url = "https://"+i+nickname
-            s = requests.Session()
-            r = s.get(url)
-            if(r.status_code == 200):
+            url = "https://{site}{nickname}".format(site=site, nickname=nickname)
+            response = requests.get(url)
+            if response.status_code == 200:
                 ans.append(url)
         except:
-            print("ERROR!!!!!")
+            pass
     return ans
 
-async def check_nickname_async(nickname,social) -> str:
+
+async def check_nickname_async(nickname, social) -> str:
     """
     checks nicknames from social networks(async)
     :param nickname: just nickname :)
@@ -42,46 +41,49 @@ async def check_nickname_async(nickname,social) -> str:
     networks which have this nickname
     """
     ans = []
-    async with aiohttp.ClientSession() as s:
+    async with aiohttp.ClientSession() as session:
         while not social.empty():
             url = await social.get()
             try:
-                async with s.get(url) as r:
-                    if(r.status == 200):
+                async with session.get(url) as response:
+                    if response.status == 200:
                         ans.append(url)
             except:
-                print("ERROR!!!!")
+                pass
     return ans
+
 
 class Runner(OsintRunner):
     def __init__(self, logger: str = __name__):
         super().__init__()
-    async def __run(self,*args,**kwargs):
+
+    async def __run(self, *args, **kwargs):
         try:
             username = kwargs.get("username")
             social = asyncio.Queue()
-            for i in networks().net:
-                await social.put("https://" + i + username)
+            for site in Networks().net:
+                await social.put(
+                    "https://{site}{username}".format(site=site, username=username)
+                )
             temp_result = await asyncio.gather(
-                *[asyncio.create_task(check_nickname_async(username, social)) for i in range(10)])
-            temp_temp_result = []
-            for i in temp_result:
-                for j in i:
-                    temp_temp_result.append(j)
-            result = {username : temp_temp_result}
+                *[
+                    asyncio.create_task(check_nickname_async(username, social))
+                    for flow in range(10)
+                ]
+            )
+            result = {username: []}
+            for sub_massive in temp_result:
+                for site in sub_massive:
+                    result[username].append(site)
             return ScriptResponse.success(
                 result=result,
-                message="yeah"
+                message="Found {count} user accounts".format(
+                    count=len(result[username])
+                ),
             )
         except Exception as err:
             return ScriptResponse.error(message=str(err))
+
     def run(self, *args, **kwargs):
-        return asyncio.run(self.__run(username="admin"))
-
-
-"""if __name__ =="__main__":
-    srcipt_module = Runner()
-    srcipt_result = asyncio.run(srcipt_module.run(username="admin"))
-    print(srcipt_result)
-"""
-
+        username = kwargs.get("username")
+        return asyncio.run(self.__run(username=username))
