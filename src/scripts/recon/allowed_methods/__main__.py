@@ -7,6 +7,9 @@ from src.core.base.recon import ReconRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
 from src.core.utils.validators import validate_kwargs
 
+from string import ascii_uppercase
+from random import seed, choice, randint
+
 
 class Defaults:
     # List of the Request Methods Recognized by Apache
@@ -41,6 +44,14 @@ class Defaults:
     ]
 
 
+def get_random_method():
+    seed()
+    letters = ascii_uppercase
+    length = randint(6, 10)
+    method = "".join(choice(letters) for i in range(length))
+    return method
+
+
 class Runner(ReconRunner):
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
@@ -60,6 +71,8 @@ class Runner(ReconRunner):
         forbidden_methods = []
         url = kwargs.get("url")
 
+        # Append random method to check if server is not faking.
+        Defaults.METHODS.append(get_random_method())
         for method in Defaults.METHODS:
             try:
                 status = request(method, url).status_code
@@ -76,6 +89,13 @@ class Runner(ReconRunner):
                 pass
 
         return ScriptResponse.success(
-            result=allowed_methods,
-            message=f"Url: {url}\nAllowed: {allowed_methods}\nForbidden: {forbidden_methods}\nFiltered: {filtered_methods}",
+            result={
+                "allowed": allowed_methods,
+                "forbidden": forbidden_methods,
+                "filtered": filtered_methods,
+            },
+            message=f"URL: {url} - "
+                    f"allowed: {len(allowed_methods)}, "
+                    f"forbidden: {len(forbidden_methods)}, "
+                    f"filtered: {len(filtered_methods)}",
         )
