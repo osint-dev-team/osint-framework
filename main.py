@@ -32,7 +32,7 @@ if __name__ == "__main__":
     osint_case = OsintCase()
     osint_case.process(username="any_value_here")
     osint_case_results = osint_case.get_results()
-    
+
     # Print out all the results
     for result in other_case_results, recon_case_results, osint_case_results:
         pprint(result)
