@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     # Will return nothing (no scripts for now, sorry!)
     osint_case = OsintCase()
-    osint_case.process(username="johndoe")
+    osint_case.process(username="any_value_here")
     osint_case_results = osint_case.get_results()
 
     # Print out all the results
