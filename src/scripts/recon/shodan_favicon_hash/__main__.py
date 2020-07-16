@@ -30,8 +30,8 @@ class Runner(ReconRunner):
         except RequestException as RE:
             return ScriptResponse.error(
                 result=None,
-                message=f"Can't connect to {url}!\n"
-                        f"Error message: {RE}\n",
+                message=f"Can't connect to {url}!"
+                        f"Error message: {RE}",
             )
 
         favicon = encodebytes(response.content)
@@ -39,6 +39,6 @@ class Runner(ReconRunner):
 
         return ScriptResponse.success(
             result=favicon_hash,
-            message=f"Successfully made favicon hash of {url}!\n"
+            message=f"Successfully made favicon hash of {url}! "
             f"Use https://www.shodan.io/search?query=http.favicon.hash:{favicon_hash}",
         )
