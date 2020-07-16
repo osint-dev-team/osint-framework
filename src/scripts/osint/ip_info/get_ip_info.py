@@ -27,6 +27,7 @@ def get_ip_info(ip: str) -> dict or str:
     :param ip: the IP address you want to know about.
     :return: string with error message in case of error or a dict with information about IP address.
     """
+    
     try:
         ipaddress.ip_address(ip)
 
