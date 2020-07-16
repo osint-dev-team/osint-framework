@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
 
-import requests
-import aiohttp
 import asyncio
-from src.core.utils.response import ScriptResponse
+from pathlib import Path
+
+import aiohttp
+import requests
+
 from src.core.base.osint import OsintRunner
+from src.core.utils.response import ScriptResponse
+
+
+class Defaults:
+    NETWORKS_LIST = "social_networks.txt"
 
 
 class Networks:
     def __init__(self):
-        with open("./src/scripts/osint/check_nickname/social_networks.txt") as f:
-            self.net = [str(i).strip() for i in f.readlines()]
+        with open(Path("./src/scripts/osint/check_nickname/data/social_networks.txt")) as file:
+            self.net = file.read().splitlines()
 
 
-def check_nickname_sync(nickname: str) -> str:
+def check_nickname_sync(nickname: str) -> list:
     """
     checks nicknames from social networks(sync)
     :param nickname: just nickname :)
@@ -33,10 +40,11 @@ def check_nickname_sync(nickname: str) -> str:
     return ans
 
 
-async def check_nickname_async(nickname, social) -> str:
+async def check_nickname_async(nickname: str, social) -> list:
     """
     checks nicknames from social networks(async)
     :param nickname: just nickname :)
+    :param social: social
     :return: list with links to user from social
     networks which have this nickname
     """
@@ -55,9 +63,10 @@ async def check_nickname_async(nickname, social) -> str:
 
 class Runner(OsintRunner):
     def __init__(self, logger: str = __name__):
-        super().__init__()
+        super().__init__(logger=logger)
 
-    async def __run(self, *args, **kwargs):
+    @staticmethod
+    async def __run(*args, **kwargs):
         try:
             username = kwargs.get("username")
             social = asyncio.Queue()
@@ -68,7 +77,7 @@ class Runner(OsintRunner):
             temp_result = await asyncio.gather(
                 *[
                     asyncio.create_task(check_nickname_async(username, social))
-                    for flow in range(10)
+                    for _ in range(10)
                 ]
             )
             result = {username: []}
