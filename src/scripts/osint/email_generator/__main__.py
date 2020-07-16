@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from time import time
 from src.scripts.osint.email_generator import EmailGenerator
 from src.core.base.osint import OsintRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
@@ -20,17 +21,12 @@ class Runner(OsintRunner):
         try:
             # to work normally you need to give a limit, because max size may be over a billion
             # to reduce the value, you can help me better dividing username into lexems
+            tm = time()
             emailgen = EmailGenerator(limit=100_000)
             result = list(emailgen.Generate(kwargs.get("username")))
         except Exception as err:
             ScriptResponse.error(message=str(err))
         else:
             return ScriptResponse.success(
-                result=result, message="Successfully finished!"
+                result=result, message="Successfully finished! script lasted {:.2f} seconds".format(time() - tm)
             )
-
-
-# if __name__ =="__main__":
-#     script_module = Runner()
-#     script_result = script_module.run(username="matveysergeev")
-#     print(script_result)
