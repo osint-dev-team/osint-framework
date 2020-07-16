@@ -22,11 +22,11 @@ class Runner(OsintRunner):
             # to work normally you need to give a limit, because max size may be over a billion
             # to reduce the value, you can help me better dividing username into lexems
             tm = time()
-            emailgen = EmailGenerator(limit=100_000)
+            email_gen = EmailGenerator(limit=100_000)
             username = kwargs.get("username")
             if username is None:
                 raise KeyError("EmailGenerator can't work without username!")
-            result = list(emailgen.Generate(username))
+            result = list(email_gen.generate(username))
         except Exception as err:
             ScriptResponse.error(message=str(err))
         else:

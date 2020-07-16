@@ -18,33 +18,33 @@ class EmailGenerator:
     def __init__(
         self,
         limit: int or None = None,
-        namebase: str or None = None,
-        domenbase: str or None = None,
+        name_base: str or None = None,
+        domen_base: str or None = None,
     ):
         """
         :param limit: max size of list of person's emails
-        :param namebase: base of names written in translit as gzipped text file
-        :param domenbase: base of email domens written in translit as text file
+        :param name_base: base of names written in translit as gzipped text file
+        :param domen_base: base of email domens written in translit as text file
         """
         self.__limit = limit
         with open("settings/settings.json", "r", encoding="utf-8") as jfile:
             data = loads(jfile.read())
             self.__domen_base = (
-                domenbase if domenbase is not None else data["domenBase"]
+                domen_base if domen_base is not None else data["domenBase"]
             )
             self.__domen_base_size = data["domenBaseSize"]
             self.__serv_syms = data["serviceSymbols"]
         self.__Divider = LanguageModel(
-            namebase if namebase is not None else data["nameBase"]
+            name_base if name_base is not None else data["nameBase"]
         )
 
-    def SetLimit(self, limit: int) -> None:
+    def set_limit(self, limit: int) -> None:
         """
         :param limit: max size of generator
         """
         self.__limit = limit
 
-    def __GetLogin(self, parts: list) -> str:
+    def __get_login(self, parts: list) -> str:
         """
         :param parts: lexemes of the username
         :return: possible login
@@ -57,7 +57,7 @@ class EmailGenerator:
             login[0] = choice(self.__serv_syms).join((login[0], login.pop(1)))
         return login.pop()
 
-    def Generate(self, username: str) -> iter:
+    def generate(self, username: str) -> iter:
         """
         :param username: username to generate email
         :return: iterator of person's emails
@@ -71,13 +71,13 @@ class EmailGenerator:
         )
         if not limit or max_size < limit:
             limit = max_size
-        loginbase = set()
+        login_base = set()
         counter = 0
         while counter <= limit:
-            login = self.__GetLogin(parts)
-            while login in loginbase:
-                login = self.__GetLogin(parts)
-            loginbase.add(login)
+            login = self.__get_login(parts)
+            while login in login_base:
+                login = self.__get_login(parts)
+            login_base.add(login)
             with open(self.__domen_base, "r") as domens:
                 for domen in domens:
                     counter += 1
