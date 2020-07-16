@@ -77,7 +77,7 @@ class Runner(ReconRunner):
         # Append random method to check if server is not faking.
         methods.append(get_random_method())
 
-        for method in Defaults.METHODS:
+        for method in methods:
             try:
                 status = request(method, url).status_code
                 method_result = {"method": method, "status": status}
