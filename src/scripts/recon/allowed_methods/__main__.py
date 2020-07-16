@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from requests import request
-from requests.exceptions import *
+from requests.exceptions import RequestException
 
 from src.core.base.recon import ReconRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
