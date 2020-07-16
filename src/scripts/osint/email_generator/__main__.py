@@ -26,7 +26,7 @@ class Runner(OsintRunner):
             username = kwargs.get("username")
             if username is None:
                 raise KeyError("EmailGenerator can't work without username!")
-            result = list(emailgen.Generate())
+            result = list(emailgen.Generate(username))
         except KeyError as err:
             ScriptResponse.error(message=str(err))
         except Exception as err:
