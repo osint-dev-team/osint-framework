@@ -71,20 +71,25 @@ class Runner(ReconRunner):
         forbidden_methods = []
         url = kwargs.get("url")
 
+        # Copy original methods list to avoid class variable modifications
+        methods = list(Defaults.METHODS)
+
         # Append random method to check if server is not faking.
-        Defaults.METHODS.append(get_random_method())
+        methods.append(get_random_method())
+
         for method in Defaults.METHODS:
             try:
                 status = request(method, url).status_code
+                method_result = {"method": method, "status": status}
 
                 # 2xx - success
                 # 405 - method not allowed
                 if 200 <= status < 300:
-                    allowed_methods.append(method)
+                    allowed_methods.append(method_result)
                 elif status == 405:
-                    forbidden_methods.append(method)
+                    forbidden_methods.append(method_result)
                 else:
-                    filtered_methods.append((method, status))
+                    filtered_methods.append(method_result)
             except RequestException:
                 pass
 
