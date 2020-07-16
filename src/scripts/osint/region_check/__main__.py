@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import requests
+
 from src.core.base.osint import OsintRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
 from src.core.utils.validators import validate_kwargs
