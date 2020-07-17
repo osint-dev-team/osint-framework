@@ -50,12 +50,12 @@ class Runner(ReconRunner):
         """
 
         try:
-            ipaddress.ip_address(ip)
+            fixed_ip = str(ipaddress.ip_address(ip))
         except ValueError:
             return 'Invalid IP address!'
 
         try:
-            response = requests.get(self.__BASE_URL.format(query=ip)).json()
+            response = requests.get(self.__BASE_URL.format(query=fixed_ip)).json()
         except Exception as err_unexp:
             response = 'Unexpected error occurred: {}'.format(str(err_unexp))
 
