@@ -29,25 +29,25 @@ class Runner(ReconRunner):
 
     def __get_ip_info(self, ip: str) -> dict or str:
         """
-            A function for retrieving location and provider info by IP address. You can get the following information:
-            - continent name
-            - country name
-            - region/state name
-            - city name
-            - district name
-            - zip code
-            - latitude
-            - longitude
-            - timezone
-            - ISP name
-            - organization name
-            - AS number and organization, separated by space (RIR). Empty for IP blocks not being announced in BGP
-              tables.
-            - hosting, colocated or data center.
+        A function for retrieving location and provider info by IP address. You can get the following information:
+        - continent name
+        - country name
+        - region/state name
+        - city name
+        - district name
+        - zip code
+        - latitude
+        - longitude
+        - timezone
+        - ISP name
+        - organization name
+        - AS number and organization, separated by space (RIR). Empty for IP blocks not being announced in BGP
+          tables.
+        - hosting, colocated or data center.
 
-            :param ip: the IP address you want to know about.
-            :return: string with error message in case of error or a dict with information about IP address.
-            """
+        :param ip: the IP address you want to know about.
+        :return: string with error message in case of error or a dict with information about IP address.
+        """
 
         try:
             ipaddress.ip_address(ip)
