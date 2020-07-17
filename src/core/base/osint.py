@@ -14,7 +14,7 @@ class PossibleKeys:
     Defines default values for the function arguments (kwargs, named args)
     """
 
-    KEYS = ["email", "username", "fullname", "vk_api_key", "phone", "ip"]
+    KEYS = ["email", "username", "fullname", "vk_api_key", "phone"]
 
 
 class OsintRunner(BaseRunner):
