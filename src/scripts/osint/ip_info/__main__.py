@@ -66,8 +66,3 @@ class Runner(ReconRunner):
             response = 'Catastrophic error occurred: {}'.format(err)
 
         return response
-
-
-r = Runner()
-res = r.run(ip='24.0.0.1')
-print(res)
