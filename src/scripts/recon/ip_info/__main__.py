@@ -22,8 +22,8 @@ class Runner(ReconRunner):
             response.pop('status', None)  # we don't need duplicate status, let's get rid of it
 
             result = ScriptResponse.success(result=response, message=msg)
-        except TypeError:
-            result = ScriptResponse.error(result=response, message='Error occurred while trying to get data!')
+        except TypeError as type_err:
+            result = ScriptResponse.error(message='Error occurred while trying to get data: {}'.format(str(type_err)))
 
         return result
 
