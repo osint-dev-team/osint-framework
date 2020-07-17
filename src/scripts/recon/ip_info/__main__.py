@@ -56,13 +56,7 @@ class Runner(ReconRunner):
 
         try:
             response = requests.get(self.__BASE_URL.format(query=ip)).json()
-        except HTTPError as err_http:
-            response = 'HTTP error occurred: {}'.format(err_http)
-        except ConnectionError as err_conn:
-            response = 'Connection error occurred: {}'.format(err_conn)
-        except Timeout as err_timeout:
-            response = 'Timeout error occurred: {}'.format(err_timeout)
-        except RequestException as err:
-            response = 'Catastrophic error occurred: {}'.format(err)
+        except Exception as err_unexp:
+            response = 'Unexpected error occurred: {}'.format(str(err_unexp))
 
         return response
