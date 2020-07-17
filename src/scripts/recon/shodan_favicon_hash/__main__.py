@@ -27,11 +27,11 @@ class Runner(ReconRunner):
 
         try:
             response = get(f"{url}/favicon.ico")
-        except RequestException as RE:
+        except RequestException as req_err:
             return ScriptResponse.error(
                 result=None,
                 message=f"Can't connect to {url}!"
-                        f"Error message: {RE}",
+                        f"Error message: {req_err}",
             )
 
         favicon = encodebytes(response.content)
