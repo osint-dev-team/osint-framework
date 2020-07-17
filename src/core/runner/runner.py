@@ -56,6 +56,7 @@ class ScriptRunner:
         loader = SourceFileLoader(fullname=script_class, path=str(path))
         module = ModuleType(name=loader.name)
         loader.exec_module(module)
+        module.__file__ = path
         class_instance = getattr(module, script_class)(logger=path.parent.stem)
         try:
             result = getattr(class_instance, function)(*args, **kwargs)
@@ -76,7 +77,7 @@ class ScriptRunner:
             ScriptRunnerPaths.CONVERT,
         ]:
             self.scripts.update({directory.stem: list()})
-            for file in directory.glob("*/__main__.py"):
+            for file in directory.glob("*/module.py"):
                 self.scripts[directory.stem].append(file)
         return self.scripts
 
