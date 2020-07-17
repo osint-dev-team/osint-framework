@@ -4,7 +4,7 @@ from pprint import pprint
 from sys import argv
 
 from src.core.utils.module import run_module
-from src.scripts.other.simple_example import module
+from .module import Runner
 
-result = run_module(module, args=argv, arg_name="username", arg_value="johndoe")
+result = run_module(Runner, args=argv, arg_name="username", arg_default="johndoe")
 pprint(result)

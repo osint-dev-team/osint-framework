@@ -4,7 +4,7 @@ from pprint import pprint
 from sys import argv
 
 from src.core.utils.module import run_module
-from src.scripts.osint.email_verifier import module
+from .module import Runner
 
-result = run_module(module, args=argv, arg_name="email", arg_value="johndoe@gmail.com")
+result = run_module(Runner, args=argv, arg_name="email", arg_default="johndoe@gmail.com")
 pprint(result)
