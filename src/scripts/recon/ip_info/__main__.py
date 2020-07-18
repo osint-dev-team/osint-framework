@@ -21,11 +21,9 @@ class Runner(ReconRunner):
             msg = 'Query successful!' if response['status'] == 'success' else 'Query failed!'
             response.pop('status', None)  # we don't need duplicate status, let's get rid of it
 
-            result = ScriptResponse.success(result=response, message=msg)
+            return ScriptResponse.success(result=response, message=msg)
         except TypeError as type_err:
-            result = ScriptResponse.error(message='Error occurred while trying to get data: {}'.format(str(type_err)))
-
-        return result
+            return ScriptResponse.error(message='Error occurred while trying to get data: {}'.format(str(type_err)))
 
     def __get_ip_info(self, ip: str) -> dict or str:
         """
@@ -55,8 +53,6 @@ class Runner(ReconRunner):
             return 'Invalid IP address!'
 
         try:
-            response = requests.get(self.__BASE_URL.format(query=validated_ip)).json()
+            return requests.get(self.__BASE_URL.format(query=validated_ip)).json()
         except Exception as err_unexp:
-            response = 'Unexpected error occurred: {}'.format(str(err_unexp))
-
-        return response
+            return 'Unexpected error occurred: {}'.format(str(err_unexp))
