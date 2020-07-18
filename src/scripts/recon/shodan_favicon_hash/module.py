@@ -30,8 +30,7 @@ class Runner(ReconRunner):
         except RequestException as req_err:
             return ScriptResponse.error(
                 result=None,
-                message=f"Can't connect to {url}!"
-                        f"Error message: {req_err}",
+                message=f"Can't connect to {url}!" f"Error message: {req_err}",
             )
 
         favicon = encodebytes(response.content)

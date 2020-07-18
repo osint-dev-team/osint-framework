@@ -16,7 +16,9 @@ class Defaults:
 
 class Networks:
     def __init__(self):
-        with open(Path(__file__).parent.joinpath(f"data/{Defaults.NETWORKS_LIST}")) as file:
+        with open(
+            Path(__file__).parent.joinpath(f"data/{Defaults.NETWORKS_LIST}")
+        ) as file:
             self.net = file.read().splitlines()
 
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 
-def run_module(runner: type, args: list, arg_name: str, arg_default: str or None = None) -> dict:
+def run_module(
+    runner: type, args: list, arg_name: str, arg_default: str or None = None
+) -> dict:
     """
     Use module as a 'python3 -m ...' module
     :param runner: runner object

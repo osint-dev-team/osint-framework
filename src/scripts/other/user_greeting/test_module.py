@@ -43,6 +43,8 @@ class UserGreetingTest(TestCase):
         Test case when we can't pass the validator (exception)
         :return: None
         """
+
         def exception_func():
             self.runner.run(wrong_argument="john")
+
         self.assertRaises(KeyError, exception_func)

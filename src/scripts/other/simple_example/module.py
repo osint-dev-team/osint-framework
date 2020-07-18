@@ -9,6 +9,7 @@ class Runner(BaseRunner):
     """
     Basic example
     """
+
     def __init__(self, logger: str = __name__):
         """
         Re-init base class instance
@@ -24,6 +25,4 @@ class Runner(BaseRunner):
         :param kwargs: kwargs
         :return: ScriptResponse message
         """
-        return ScriptResponse.success(
-            message="Script finished"
-        )
+        return ScriptResponse.success(message="Script finished")
