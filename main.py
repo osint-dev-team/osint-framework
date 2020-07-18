@@ -13,26 +13,33 @@ from pprint import pprint
 from src.core.case.osint import OsintCase
 from src.core.case.recon import ReconCase
 from src.core.case.base import BaseCase
+from src.core.utils.log import Logger
+
+
+logger = Logger.get_logger(name="osint-framework")
+
+
+def run_case(case_class: type, *args, **kwargs):
+    """
+    Define and smoke run the BaseCase
+    :param case_class: original class of the case
+    :param args: some args
+    :param kwargs: some kwargs
+    :return: result of the execution
+    """
+    logger.info(f"start {case_class.__name__} case processing")
+    case = case_class()
+    case.process(*args, **kwargs)
+    return case.get_results()
 
 
 if __name__ == "__main__":
-    # Will return 2 results from "other" category scripts
-    other_case = BaseCase()
-    other_case.process(
-        username="johndoe", email="johndoe@gmail.com", fullname="John Doe",
-    )
-    other_case_results = other_case.get_results()
+    # fmt: off
+    base_case = run_case(case_class=BaseCase, username="johndoe", email="johndoe@gmail.com", fullname="John Doe")
+    osint_case = run_case(case_class=OsintCase, username="johndoe", email="johndoe@gmail.com", fullname="John Doe")
+    recon_case = run_case(case_class=ReconCase, url="https://facebook.com")
 
-    # Will return 1 result from "recon" category scripts
-    recon_case = ReconCase()
-    recon_case.process(url="https://facebook.com")
-    recon_case_results = recon_case.get_results()
-
-    # Will return nothing (no scripts for now, sorry!)
-    osint_case = OsintCase()
-    osint_case.process(username="any_value_here")
-    osint_case_results = osint_case.get_results()
-
-    # Print out all the results
-    for result in other_case_results, recon_case_results, osint_case_results:
-        pprint(result)
+    pprint(base_case)
+    pprint(osint_case)
+    pprint(recon_case)
+    # fmt: on
