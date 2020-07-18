@@ -11,8 +11,4 @@ def run_module(runner: type, args: list, arg_name: str, arg_default: str or None
     :return: results
     """
     runner = runner()
-    try:
-        arg_value = args[1]
-    except:
-        pass
-    return runner.run(**{arg_name: arg_default})
+    return runner.run(**{arg_name: args[1] if len(args) >= 2 else arg_default})
