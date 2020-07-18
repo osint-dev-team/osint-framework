@@ -32,14 +32,14 @@ class ScriptRunner:
         self.scripts = {}
         self.results = {}
 
+    @staticmethod
     def exec_script(
-        self,
         path: str or Path,
         script_class: str = "Runner",
         function: str = "run",
         args: list or None = None,
         kwargs: dict or None = None,
-    ) -> ScriptResponse:
+    ) -> ScriptResponse or dict:
         """
         Load and exec python script
         :param path: name of the script to load
@@ -55,14 +55,34 @@ class ScriptRunner:
             kwargs = {}
         loader = SourceFileLoader(fullname=script_class, path=str(path))
         module = ModuleType(name=loader.name)
-        loader.exec_module(module)
-        module.__file__ = path
-        class_instance = getattr(module, script_class)(logger=path.parent.stem)
+        result = {"script": Path(path).parent.stem}
+
+        # Check if don't forget to install all the dependencies, and that module can
+        # be successfully loaded.
+
+        # fmt: off
         try:
-            result = getattr(class_instance, function)(*args, **kwargs)
+            loader.exec_module(module)
         except Exception as unexp_err:
-            result = ScriptResponse.error(message=str(unexp_err))
-        result.update({"script": Path(path).parent.stem})
+            result.update(ScriptResponse.error(message=f"Unexpected module error: {str(unexp_err)}"))
+            return result
+        # fmt: on
+
+        # Module successfully loaded. We can set some module-scope variables that
+        # we missed.
+        module.__file__ = path
+
+        # Execute the runner and check if something goes wrong.
+
+        # fmt: off
+        try:
+            class_instance = getattr(module, script_class)(logger=path.parent.stem)
+            result.update(getattr(class_instance, function)(*args, **kwargs))
+        except Exception as unexp_err:
+            result.update(ScriptResponse.error(message=f"Unexpected execution error: {str(unexp_err)}"))
+        # fmt: on
+
+        # In any possible case, return result from the module or ScriptResponse.error + script name
         return result
 
     def get_scripts(self) -> dict:
