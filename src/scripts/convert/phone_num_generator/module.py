@@ -1,48 +1,14 @@
 #!/usr/bin/env python3
-from phonenumbers import NumberParseException, parse
+from phonenumbers import NumberParseException, parse, format_number, PhoneNumberFormat
 
 from src.core.base.osint import OsintRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
 from src.core.utils.validators import validate_kwargs
-from random import randint
-import phonenumbers
-
-
-
-
-
-
-#
-# def test():
-#     """
-#     Test function to check the code
-#     """
-#     rand_number_test = rand_num_gen()
-#     normal_num = normalise(rand_number_test)
-#     final_list = gen_all(normal_num)
-#     print(final_list)
-#     # this loop just proves that the normaliser works correctly
-#     for number in final_list:
-#         print(normalise(number))
-#
-#
-#test()
-#
-# x = phonenumbers.parse("+442083661177", None)
 
 
 class Runner(OsintRunner):
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
-
-    @staticmethod
-    def rand_num_gen() -> str:
-        """
-        I don't think we need this anymore
-        Generates a random number for the test
-        :return: string representation of the number
-        """
-        return "+7" + "".join([str(randint(1, 9)) for _ in range(10)])
 
     @staticmethod
     def __gen_all(parsed_num: str) -> [str]:
@@ -68,10 +34,9 @@ class Runner(OsintRunner):
 
     @staticmethod
     def __phone_number_list(self, parsed_num: str) -> [str]:
-        return self.__gen_all(phonenumbers.format_number(parsed_num, phonenumbers.PhoneNumberFormat.NATIONAL)) + \
-               self.__gen_all(phonenumbers.format_number(parsed_num, phonenumbers.PhoneNumberFormat.INTERNATIONAL)) +\
-               self.__gen_all(phonenumbers.format_number(parsed_num, phonenumbers.PhoneNumberFormat.E164))
-
+        return self.__gen_all(format_number(parsed_num, PhoneNumberFormat.NATIONAL)) + \
+               self.__gen_all(format_number(parsed_num, PhoneNumberFormat.INTERNATIONAL)) + \
+               self.__gen_all(format_number(parsed_num, PhoneNumberFormat.E164))
 
     @validate_kwargs(PossibleKeys.KEYS)
     def run(self, *args, **kwargs) -> ScriptResponse.success or ScriptResponse.error:
