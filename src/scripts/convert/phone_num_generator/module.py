@@ -45,6 +45,8 @@ class Runner(OsintRunner):
             parsed_num = parse(phone, None)
         except NumberParseException:
             return ScriptResponse.error(result=None, message="Not viable number or not international format")
+        except Exception:
+            return ScriptResponse.error(result=None, message="Something went wrong!")
         try:
             result = self.__gen_all(format_number(parsed_num, PhoneNumberFormat.NATIONAL)) + \
                      self.__gen_all(format_number(parsed_num, PhoneNumberFormat.INTERNATIONAL)) + \
