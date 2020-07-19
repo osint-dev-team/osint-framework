@@ -11,32 +11,26 @@ class Runner(OsintRunner):
         super(Runner, self).__init__(logger)
 
     @staticmethod
-    def __gen_all(parsed_num: str) -> [str]:
+    def __gen_all(formatted_num: str) -> [str]:
         """
         Generates all possible variants of number formats
-        :param parsed_num: parsed number
+        :param formatted_num: formatted number
         :return: the list of all formats
         """
-        number_groups = parsed_num.split(" ")
-        num_list = [parsed_num]
+        number_groups = formatted_num.split(" ")
+        num_list = [formatted_num]
         separators = ["", "-", "."]
         # Automate some separation formats of numbers
         for sep in separators:
             joined = sep.join(number_groups)
-            num_list.extend((joined, f"+{joined}"))
+            num_list.append(joined)
         phone_w_brackets = "{prefix}({code}){rest}".format(
             prefix=number_groups[0],
             code=number_groups[1],
             rest="".join(number_groups[2:])
         )
-        num_list.extend((phone_w_brackets, f"+{phone_w_brackets}"))
+        num_list.append(phone_w_brackets)
         return num_list
-
-    @staticmethod
-    def __phone_number_list(self, parsed_num: str) -> [str]:
-        return self.__gen_all(format_number(parsed_num, PhoneNumberFormat.NATIONAL)) + \
-               self.__gen_all(format_number(parsed_num, PhoneNumberFormat.INTERNATIONAL)) + \
-               self.__gen_all(format_number(parsed_num, PhoneNumberFormat.E164))
 
     @validate_kwargs(PossibleKeys.KEYS)
     def run(self, *args, **kwargs) -> ScriptResponse.success or ScriptResponse.error:
@@ -48,17 +42,20 @@ class Runner(OsintRunner):
         """
         try:
             phone = kwargs.get("phone")
-            parsed_number = parse(phone)
+            parsed_num = parse(phone, None)
         except NumberParseException:
             return ScriptResponse.error(result=None, message="Not viable number or not international format")
         try:
-            result = self.__phone_number_list(parsed_number)
+            result = self.__gen_all(format_number(parsed_num, PhoneNumberFormat.NATIONAL)) + \
+                     self.__gen_all(format_number(parsed_num, PhoneNumberFormat.INTERNATIONAL)) + \
+                     [format_number(parsed_num, PhoneNumberFormat.E164)]
+            result = list(dict.fromkeys(result))
         except Exception:
             return ScriptResponse.error(result=None, message="Something went wrong!")
 
         return ScriptResponse.success(
             result=result,
-            message=f"All possible number formats: {result} | for phone number {phone}",
+            message=f"All possible number formats for phone number {phone}",
         )
 
 
