@@ -20,10 +20,10 @@ class TestClassHTTPRequestHandler(BaseHTTPRequestHandler):
     Defines mocking server class
     """
 
-    def do_GET(self):
+    def do_GET(self) -> None:
         """
         Defines basic handlers
-        :return:
+        :return: None
         """
         if self.path == "/":
             self.mock_endpoint()
