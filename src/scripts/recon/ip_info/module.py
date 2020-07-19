@@ -1,7 +1,6 @@
 import ipaddress
 
 import requests
-from requests.exceptions import HTTPError, ConnectionError, Timeout, RequestException
 
 from src.core.base.recon import ReconRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
