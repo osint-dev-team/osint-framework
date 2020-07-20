@@ -85,7 +85,9 @@ class GetTitleTest(TestCase):
         :return: None
         """
         response = self.runner.run(
-            url="http://{HOST}:{PORT}".format(HOST=DefaultValues.HOST, PORT=DefaultValues.PORT)
+            url="http://{HOST}:{PORT}".format(
+                HOST=DefaultValues.HOST, PORT=DefaultValues.PORT
+            )
         )
         self.assertEqual(response.get("status"), "success")
 

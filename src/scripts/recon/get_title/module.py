@@ -3,7 +3,6 @@ import requests
 
 from src.core.base.recon import ReconRunner
 from src.core.utils.response import ScriptResponse
-from src.core.utils.validators import validate_kwargs
 
 
 class Runner(ReconRunner):
@@ -18,12 +17,22 @@ class Runner(ReconRunner):
         :return: http title if it's exist
         """
         url = kwargs.get("url")
-        response = requests.get(url)
+        response = None
+        result = "None title or Bad url"
+        try:
+            response = requests.get(url)
+        except:
+            pass
+        if response is None:
+            return ScriptResponse.success(
+                result=result, message="Title on {url} is: ".format(url=url)
+            )
         response = response.text
-        result = "None title"
-        if response.find('<title>') != -1 and response.find('</title>') != -1:
+        if response.find("<title>") != -1 and response.find("</title>") != -1:
             try:
-                result = response[response.find('<title>') + 7: response.find('</title>')]
+                result = response[
+                    response.find("<title>") + 7 : response.find("</title>")
+                ]
             except:
                 pass
         return ScriptResponse.success(
