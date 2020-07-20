@@ -1,0 +1,12 @@
+twitter.com/
+vk.com/
+ok.ru/
+instagram.com/
+github.com/
+reddit.com/user/
+tiktok.com/@
+mastodon.social/@
+blackplanet.com/
+flickr.com/photos/
+
+
