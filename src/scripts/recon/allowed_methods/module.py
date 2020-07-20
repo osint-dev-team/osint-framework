@@ -105,6 +105,6 @@ class Runner(ReconRunner):
             message=f"URL: {url} - "
             f"allowed: {len(allowed_methods)}, "
             f"forbidden: {len(forbidden_methods)}, "
-            f"filtered: {len(filtered_methods)}"
+            f"filtered: {len(filtered_methods)}, "
             f"server_error: {len(server_error)}",
         )
