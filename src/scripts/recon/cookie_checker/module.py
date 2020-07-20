@@ -55,16 +55,16 @@ class Runner(ReconRunner):
 
         result = {}
 
-
         response = get(url)
-
         for cookie in response.cookies:
             result[cookie.name] = {
                 "Path": cookie.path,
                 "Secure": cookie.secure,
                 "HttpOnly": self.__has_http_only(cookie),
-                "Prefix": cookie.name.startswith(("__Secure-", "__Host-")),
-                "Same-Site": cookie.__dict__.get("_rest").get("SameSite", "None")
+                "Prefix": cookie.name.startswith(("__Secure-", "__Host-"))
+                if cookie.name
+                else False,
+                "Same-Site": cookie.__dict__.get("_rest").get("SameSite", "None"),
             }
 
         return ScriptResponse.success(
