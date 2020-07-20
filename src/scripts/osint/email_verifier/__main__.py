@@ -1,22 +1,12 @@
 #!/usr/bin/env python3
 
-from verify_email import verify_email
+from pprint import pprint
+from sys import argv
 
-from src.core.base.osint import OsintRunner, PossibleKeys
-from src.core.utils.response import ScriptResponse
-from src.core.utils.validators import validate_kwargs
+from src.core.utils.module import run_module
+from .module import Runner
 
-
-class Runner(OsintRunner):
-    def __init__(self, logger: str = __name__):
-        super(Runner, self).__init__(logger)
-
-    @validate_kwargs(PossibleKeys.KEYS)
-    def run(self, *args, **kwargs) -> ScriptResponse.success or ScriptResponse.error:
-        email = kwargs.get("email")
-        result = verify_email(email)
-        if not result:
-            return ScriptResponse.success(
-                result=result, message=f"Sorry, email {email} does not exist"
-            )
-        return ScriptResponse.success(result=result, message=f"Email {email} exists")
+result = run_module(
+    Runner, args=argv, arg_name="email", arg_default="johndoe@gmail.com"
+)
+pprint(result)
