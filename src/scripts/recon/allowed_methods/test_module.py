@@ -185,7 +185,7 @@ class AllowedMethodsTest(TestCase):
 
 class AllowedMethodsFailTest(TestCase):
     """
-    Defines basic tests for the network usage
+    Defines basic tests for the allowed_methods script, but on offline server
     """
     def setUp(self):
         """
