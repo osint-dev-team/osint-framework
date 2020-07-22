@@ -1,5 +1,13 @@
+#!/usr/bin/env python3
+
 from unittest import TestCase
 from .module import Runner
+
+
+class DefaultValues:
+    # Set Google DNS Resolver as the default host to test
+    HOST_IP = "8.8.8.8"
+    HOST_CITY = "Ashburn"
 
 
 class IPInfoTest(TestCase):
@@ -19,9 +27,9 @@ class IPInfoTest(TestCase):
         :return: None
         """
 
-        res = self.runner.run(ip='abcde')
+        res = self.runner.run(ip="abcde")
 
-        self.assertEqual(res.get('status'), 'error')
+        self.assertEqual(res.get("status"), "error")
 
     def test_valid_ip_regular_format(self) -> None:
         """
@@ -31,10 +39,10 @@ class IPInfoTest(TestCase):
         :return: None
         """
 
-        res = self.runner.run(ip='24.48.0.1')
+        res = self.runner.run(ip=DefaultValues.HOST_IP)
 
-        self.assertEqual(res.get('status'), 'success')
-        self.assertEqual(res.get('result').get('city'), 'Montreal')
+        self.assertEqual(res.get("status"), "success")
+        self.assertEqual(res.get("result").get("city"), DefaultValues.HOST_CITY)
 
     def test_valid_ip_dec_format(self) -> None:
         """
@@ -44,7 +52,8 @@ class IPInfoTest(TestCase):
         :return: None
         """
 
-        res = self.runner.run(ip=405798913)  # this IP is the same as IP in previous test function.
+        # this IP is the same as IP in previous test function.
+        res = self.runner.run(ip=134744072)
 
-        self.assertEqual(res.get('status'), 'success')
-        self.assertEqual(res.get('result').get('city'), 'Montreal')
+        self.assertEqual(res.get("status"), "success")
+        self.assertEqual(res.get("result").get("city"), DefaultValues.HOST_CITY)
