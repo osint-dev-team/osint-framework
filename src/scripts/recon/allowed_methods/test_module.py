@@ -174,19 +174,22 @@ class AllowedMethodsTest(TestCase):
         """
         Tests all methods on mocked server (responses are hardcoded)
         """
-        result = self.runner.run(url = f"http://{DefaultValues.HOST}:{DefaultValues.PORT}")
+        result = self.runner.run(
+            url=f"http://{DefaultValues.HOST}:{DefaultValues.PORT}"
+        )
         self.assertIsInstance(result, dict)
-        self.assertIs(result['status'], 'success')
-        self.assertEqual(len(result['result']['allowed']), 3)
-        self.assertEqual(len(result['result']['filtered']), 21)
-        self.assertEqual(len(result['result']['forbidden']), 4)
-        self.assertEqual(len(result['result']['server_error']), 0)
+        self.assertIs(result["status"], "success")
+        self.assertEqual(len(result["result"]["allowed"]), 3)
+        self.assertEqual(len(result["result"]["filtered"]), 21)
+        self.assertEqual(len(result["result"]["forbidden"]), 4)
+        self.assertEqual(len(result["result"]["server_error"]), 0)
 
 
 class AllowedMethodsFailTest(TestCase):
     """
     Defines basic tests for the allowed_methods script, but on offline server
     """
+
     def setUp(self):
         """
         Setup something before each test function
@@ -206,10 +209,12 @@ class AllowedMethodsFailTest(TestCase):
         """
         Tests module on offline server.
         """
-        result = self.runner.run(url=f"http://{DefaultValues.HOST}:{DefaultValues.PORT}")
+        result = self.runner.run(
+            url=f"http://{DefaultValues.HOST}:{DefaultValues.PORT}"
+        )
         self.assertIsInstance(result, dict)
-        self.assertIs(result['status'], 'success')
-        self.assertEqual(len(result['result']['allowed']), 0)
-        self.assertEqual(len(result['result']['filtered']), 0)
-        self.assertEqual(len(result['result']['forbidden']), 0)
-        self.assertEqual(len(result['result']['server_error']), 28)
+        self.assertIs(result["status"], "success")
+        self.assertEqual(len(result["result"]["allowed"]), 0)
+        self.assertEqual(len(result["result"]["filtered"]), 0)
+        self.assertEqual(len(result["result"]["forbidden"]), 0)
+        self.assertEqual(len(result["result"]["server_error"]), 28)
