@@ -17,28 +17,17 @@ class Runner(OsintRunner):
         :param formatted_num: formatted number
         :return: the list of all formats
         """
-<<<<<<< HEAD
-        print(formatted_num)
         number_groups = formatted_num.split(" ")
         num_list = [formatted_num]
         separators = ["", "-"]
-=======
-        number_groups = formatted_num.split(" ")
-        num_list = [formatted_num]
-        separators = ["", "-", "."]
->>>>>>> ef85dbbd8be1771cbf0c23861ce2e2a63edcd12f
         # Automate some separation formats of numbers
         for sep in separators:
             joined = sep.join(number_groups)
             num_list.append(joined)
         phone_w_brackets = "{prefix}({code}){rest}".format(
             prefix=number_groups[0],
-<<<<<<< HEAD
             code=number_groups[1][1:-1] if number_groups[1][0] == '(' and number_groups[1][-1] == ')' else
             number_groups[1],
-=======
-            code=number_groups[1],
->>>>>>> ef85dbbd8be1771cbf0c23861ce2e2a63edcd12f
             rest="".join(number_groups[2:])
         )
         num_list.append(phone_w_brackets)
