@@ -21,6 +21,7 @@ class TestClassHTTPRequestHandler(BaseHTTPRequestHandler):
     """
     Defines mocking server class
     """
+
     def do_GET(self) -> None:
         """
         Defines GET http method. Responses only to /favicon.ico
@@ -38,7 +39,7 @@ class TestClassHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "image/x-icon")
         self.end_headers()
-        with open(Path(__file__).parent.joinpath("data/favicon.ico"), 'rb') as favicon:
+        with open(Path(__file__).parent.joinpath("data/favicon.ico"), "rb") as favicon:
             self.wfile.write(favicon.read())
 
 
@@ -100,6 +101,7 @@ class FaviconHashFailTest(TestCase):
     """
     Defines basic tests for the Shodan favicon hash script, but on offline server
     """
+
     def setUp(self):
         """
         Setup something before each test function
@@ -119,7 +121,9 @@ class FaviconHashFailTest(TestCase):
         """
         Tests module on offline server.
         """
-        result = self.runner.run(url=f"http://{DefaultValues.HOST}:{DefaultValues.PORT}")
+        result = self.runner.run(
+            url=f"http://{DefaultValues.HOST}:{DefaultValues.PORT}"
+        )
         self.assertIsInstance(result, dict)
-        self.assertIs(result['result'], None)
-        self.assertIn("Error", result['message'])
+        self.assertIs(result["result"], None)
+        self.assertIn("Error", result["message"])
