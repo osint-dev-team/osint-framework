@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+
 from src.core.base.recon import ReconRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
 from src.core.utils.validators import validate_kwargs
 from requests import get
-import http.cookiejar as cookiejar
+from http import cookiejar
 
 
 class Runner(ReconRunner):
@@ -21,7 +22,8 @@ class Runner(ReconRunner):
         """
         super(Runner, self).__init__(logger)
 
-    def __has_http_only(self, cookie: cookiejar.Cookie) -> bool:
+    @staticmethod
+    def __has_http_only(cookie: cookiejar.Cookie) -> bool:
         """
         Checks the specified cookie
         for the HttpOnly flag.
