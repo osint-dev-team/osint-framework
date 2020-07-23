@@ -2,20 +2,14 @@
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
-from random import randrange
 from threading import Thread
 from unittest import TestCase
 
+from src.core.values.defaults import TestDefaults
 from .module import Runner
 
 
-class DefaultValues:
-    """
-    Set default localhost values
-    """
-
-    HOST = "127.0.0.1"
-    PORT = randrange(20_000, 65_635)
+DefaultValues = TestDefaults()
 
 
 class TestClassHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -142,7 +136,7 @@ class FaviconHashFailTest(TestCase):
                 :param _kwargs: original kwargs
                 :return: patched request
                 """
-                return original_request(*_args, **_kwargs, timeout=0.1)
+                return original_request(*_args, **_kwargs, timeout=DefaultValues.DOWN_TIMEOUT)
 
             # Wrap runner in timeout request
             src.scripts.recon.shodan_favicon_hash.module.get = patch_request
