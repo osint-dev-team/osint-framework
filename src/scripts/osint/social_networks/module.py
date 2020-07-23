@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import platform
 from pathlib import Path
 from time import sleep
@@ -41,7 +43,12 @@ class Runner(OsintRunner):
 
     @validate_kwargs(PossibleKeys.KEYS)
     def run(self, *args, **kwargs) -> ScriptResponse.success or ScriptResponse.error:
-        country_code, phone_number = self.__split_phone_number(kwargs.get('phone'))
+        try:
+            country_code, phone_number = self.__split_phone_number(kwargs.get('phone'))
+        except Exception as e:
+            return ScriptResponse.success(message=str(e))
+
+        self.__driver.get(Constants.BASE_URL)
 
         # fill the first name and the last name
         self.__fill_form_field((By.ID, 'ij_first_name'), Constants.FIRST_NAME)
@@ -81,25 +88,24 @@ class Runner(OsintRunner):
         self.__click_elem((By.ID, 'join_send_phone'))
         sleep(1)
 
-        result = None
-
         try:
             WebDriverWait(self.__driver, Defaults.MAX_TIMEOUT).until(ec.presence_of_element_located(
                 (By.ID, 'join_called_phone')))
-            error = self.__driver.find_element_by_class_name('msg_text')
 
-            if error.find_elements_by_tag_name('b')[0].text.lower() == 'invalid phone number':
-                result = ScriptResponse.success(message='Phone number is invalid!')
-            else:
-                result = ScriptResponse.success(message='There is a user with such phone number!')
-
+            self.__driver.quit()
+            return ScriptResponse.success(message='There is a user with such phone number!')
         except TimeoutException:
-            result = ScriptResponse.success(message='User with such phone number doesn\'t exist!')
-
-        return result
+            self.__driver.quit()
+            return ScriptResponse.success(message='User with such phone number doesn\'t exist!')
 
     @staticmethod
-    def __get_driver_path():
+    def __get_driver_path() -> str:
+        """
+        A method that returns path to chromedriver (with considering OS).
+
+        :return: path to chromedriver.
+        """
+
         return str(Path().resolve() / 'web_drivers' / ('chromedriver_' + platform.system().lower()))
 
     @staticmethod
@@ -142,9 +148,12 @@ class Runner(OsintRunner):
 
     @staticmethod
     def __split_phone_number(phone_number):
-        pn = phonenumbers.parse(phone_number)
+        try:
+            pn = phonenumbers.parse(phone_number)
+        except phonenumbers.NumberParseException as err_parse:
+            raise phonenumbers.NumberParseException('Invalid phone number!') from err_parse
 
         if not phonenumbers.is_valid_number(pn):
             raise ValueError('Invalid phone number!')
 
-        return '+' + pn.country_code, pn.national_number
+        return '+' + str(pn.country_code), str(pn.national_number)
