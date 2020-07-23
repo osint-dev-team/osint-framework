@@ -7,7 +7,7 @@ from threading import Thread
 
 
 
-class GetTitleTest(TestCase):
+class NicknameCheckTest(TestCase):
 
 
     def setUp(self):
