@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-from unittest import TestCase
-from .module import Runner
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from threading import Thread
-
 from pathlib import Path
+from random import randrange
+from threading import Thread
+from unittest import TestCase
+
+from .module import Runner
 
 
 class DefaultValues:
@@ -14,7 +15,7 @@ class DefaultValues:
     """
 
     HOST = "127.0.0.1"
-    PORT = 1337
+    PORT = randrange(20_000, 65_635)
 
 
 class TestClassHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -121,6 +122,37 @@ class FaviconHashFailTest(TestCase):
         """
         Tests module on offline server.
         """
+
+        original_run = self.runner.run
+
+        def patch_run(*args, **kwargs):
+            """
+            Patch run function from module to provide request timeout, monkey patching boi!
+            :param args: original args
+            :param kwargs: original kwargs
+            :return: results of the original 'runner.run' function
+            """
+            import src.scripts.recon.shodan_favicon_hash.module
+            original_request = src.scripts.recon.shodan_favicon_hash.module.get
+
+            def patch_request(*_args, **_kwargs):
+                """
+                Patch Python 'requests' module 'get' method to provide timeout
+                :param _args: original args
+                :param _kwargs: original kwargs
+                :return: patched request
+                """
+                return original_request(*_args, **_kwargs, timeout=0.1)
+
+            # Wrap runner in timeout request
+            src.scripts.recon.shodan_favicon_hash.module.get = patch_request
+            original_run_results = original_run(*args, **kwargs)
+            src.scripts.recon.shodan_favicon_hash.module.get = original_request
+
+            return original_run_results
+
+        self.runner.run = patch_run
+
         result = self.runner.run(
             url=f"http://{DefaultValues.HOST}:{DefaultValues.PORT}"
         )

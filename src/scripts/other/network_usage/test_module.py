@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
-from unittest import TestCase
-from .module import Runner
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from random import randrange
 from threading import Thread
+from unittest import TestCase
+
+from .module import Runner
 
 
 class DefaultValues:
@@ -12,7 +14,7 @@ class DefaultValues:
     """
 
     HOST = "127.0.0.1"
-    PORT = 1337
+    PORT = randrange(20_000, 65_635)
 
 
 class TestClassHTTPRequestHandler(BaseHTTPRequestHandler):
