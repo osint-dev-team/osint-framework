@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-from src.core.base.recon import ReconRunner, PossibleKeys
+from src.core.base.recon import ReconRunner
 from src.core.utils.response import ScriptResponse
-from src.core.utils.validators import validate_kwargs
 from requests import get
 from requests.utils import CaseInsensitiveDict
 
@@ -20,7 +19,6 @@ class Runner(ReconRunner):
         """
         return get(hostname).headers
 
-    @validate_kwargs(PossibleKeys.KEYS)
     def run(self, *args, **kwargs) -> ScriptResponse.success or ScriptResponse.error:
         """
         Main runner function for the script
