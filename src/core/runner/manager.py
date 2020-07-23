@@ -6,11 +6,11 @@ Defines multiprocessing manager
 
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
+from src.core.utils.log import Logger
 
 from src.core.case.base import BaseCase
 from src.core.case.osint import OsintCase
 from src.core.case.recon import ReconCase
-from src.core.utils.log import Logger
 
 logger = Logger.get_logger(name=__name__)
 

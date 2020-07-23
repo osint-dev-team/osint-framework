@@ -4,9 +4,14 @@
 Main runner.
 """
 
+from logging import basicConfig, INFO
 from pprint import pprint
 
 from src.core.runner.manager import CaseManager
+from src.core.utils.log import Logger
+
+basicConfig(level=INFO)
+logger = Logger.get_logger(name="osint-framework")
 
 
 class DefaultValues:
@@ -68,6 +73,7 @@ class DefaultValues:
 
 if __name__ == "__main__":
     # fmt: off
+    logger.info(f"Start framework for {len(DefaultValues.CASES)} cases")
 
     # Define CaseManager class
     manager = CaseManager(cases=DefaultValues.CASES, max_workers=10)

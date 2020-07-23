@@ -7,13 +7,10 @@ Defines basic scripts runner
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from importlib.machinery import SourceFileLoader
-from logging import basicConfig, INFO
 from pathlib import Path
 from types import ModuleType
 
 from src.core.utils.response import ScriptResponse
-
-basicConfig(level=INFO)
 
 
 class Defaults:
