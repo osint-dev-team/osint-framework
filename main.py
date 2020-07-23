@@ -7,39 +7,64 @@ Please, for all the searches, use the following classes:
 'BaseCase', 'OsintCase', 'ReconCase'
 """
 
-
+from src.core.runner.manager import CaseManager
 from pprint import pprint
-
-from src.core.case.osint import OsintCase
-from src.core.case.recon import ReconCase
-from src.core.case.base import BaseCase
-from src.core.utils.log import Logger
-
-
-logger = Logger.get_logger(name="osint-framework")
-
-
-def run_case(case_class: type, *args, **kwargs):
-    """
-    Define and smoke run the BaseCase
-    :param case_class: original class of the case
-    :param args: some args
-    :param kwargs: some kwargs
-    :return: result of the execution
-    """
-    logger.info(f"start {case_class.__name__} case processing")
-    case = case_class()
-    case.process(*args, **kwargs)
-    return case.get_results()
 
 
 if __name__ == "__main__":
     # fmt: off
-    base_case = run_case(case_class=BaseCase, username="johndoe", email="johndoe@gmail.com", fullname="John Doe")
-    osint_case = run_case(case_class=OsintCase, username="johndoe", email="johndoe@gmail.com", fullname="John Doe")
-    recon_case = run_case(case_class=ReconCase, url="https://facebook.com")
+    cases = [
+        {
+            "case": "base",
+            "kwargs": {
+                "username": "testname",
+                "email": "testmail@gmail.com",
+                "fullname": "Test Name"
+            }
+        },
+        {
+            "case": "osint",
+            "kwargs": {
+                "username": "johndoe",
+                "email": "johndoe@gmail.com",
+                "fullname": "John Doe"
+            }
+        },
+        {
+            "case": "recon",
+            "kwargs": {
+                "url": "https://facebook.com",
+            }
+        },
+        {
+            "case": "recon",
+            "kwargs": {
+                "url": "https://habr.com",
+            }
+        },
+        {
+            "case": "recon",
+            "kwargs": {
+                "ip": "8.8.8.8"
+            }
+        },
+        {
+            "case": "recon",
+            "kwargs": {
+                "url": "https://habr.com",
+            }
+        },
+        {
+            "case": "recon",
+            "kwargs": {
+                "ip": "13.91.95.74"
+            }
+        },
+    ]
 
-    pprint(base_case)
-    pprint(osint_case)
-    pprint(recon_case)
+    manager = CaseManager(cases=cases, max_workers=10)
+    results = manager.multi_case_runner()
+    for result in results:
+        pprint(result)
+
     # fmt: on
