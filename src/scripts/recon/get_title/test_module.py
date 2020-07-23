@@ -37,7 +37,7 @@ class TestClassHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html; charset=utf-8")
         self.end_headers()
         self.wfile.write(
-            b"<html><body><i>Mock page from Mocking Class</i></body></html>"
+            b"<html><body><title>Mock page from Mocking Class</title></body></html>"
         )
 
 
@@ -90,11 +90,14 @@ class GetTitleTest(TestCase):
             )
         )
         self.assertEqual(response.get("status"), "success")
+        self.assertEqual(response.get("result"), "Mock page from Mocking Class")
 
     def test_remote_server(self) -> None:
         """
         Test values from the remote server
         :return: None
         """
+        response = self.runner.run(url=f"https://facebook.co")
+        self.assertEqual(response.get("status"), "error")
         response = self.runner.run(url=f"https://facebook.com")
         self.assertEqual(response.get("status"), "success")
