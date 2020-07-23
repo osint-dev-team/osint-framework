@@ -76,7 +76,7 @@ if __name__ == "__main__":
     logger.info(f"Start framework for {len(DefaultValues.CASES)} cases")
 
     # Define CaseManager class
-    manager = CaseManager(cases=DefaultValues.CASES, max_workers=10)
+    manager = CaseManager(cases=DefaultValues.CASES, max_workers=5)
 
     # Run all the cases in parallel way
     multiple_results = manager.multi_case_runner()

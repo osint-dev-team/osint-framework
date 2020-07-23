@@ -98,15 +98,17 @@ class ScriptRunner:
                 self.scripts[directory.stem].append(file)
         return self.scripts
 
-    def run_category(self, category: str, *args, **kwargs) -> None:
+    def run_category(self, category: str, max_workers: int = 10, *args, **kwargs) -> None:
         """
         Run a category with scripts
+        :param category: category to run
+        :param max_workers: max quantity of workers
         :return: nothing
         """
         if not self.scripts:
             self.get_scripts()
         futures = []
-        with ThreadPoolExecutor(max_workers=10) as executor:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             for script in self.scripts.get(category, []):
                 futures.append(
                     executor.submit(
