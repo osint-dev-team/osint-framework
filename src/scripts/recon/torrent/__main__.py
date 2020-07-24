@@ -2,9 +2,10 @@
 
 from pprint import pprint
 from sys import argv
-
+from requests import get
 from src.core.utils.module import run_module
 from .module import Runner
 
-result = run_module(Runner, args=argv, arg_name="ip", arg_default="5.44.169.207")
+result = run_module(Runner, args=argv, arg_name="ip", arg_default=get("https://ifconfig.me/").text)
 pprint(result)
+pprint(get("https://ifconfig.me/").text)
