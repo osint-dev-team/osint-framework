@@ -19,6 +19,8 @@ class Runner(OsintRunner):
         """
         number_groups = formatted_num.split(" ")
         num_list = [formatted_num]
+        if len(number_groups) == 1:
+            return num_list
         separators = ["", "-"]
         # Automate some separation formats of numbers
         for sep in separators:
@@ -43,7 +45,8 @@ class Runner(OsintRunner):
         """
         try:
             phone = kwargs.get("phone")
-            parsed_num = parse(phone, None)
+            region = kwargs.get("region")
+            parsed_num = parse(phone, region)
         except NumberParseException:
             return ScriptResponse.error(result=None, message="Not viable number or not international format")
         except Exception:
@@ -51,7 +54,7 @@ class Runner(OsintRunner):
         try:
             result = self.__gen_all(format_number(parsed_num, PhoneNumberFormat.NATIONAL)) + \
                      self.__gen_all(format_number(parsed_num, PhoneNumberFormat.INTERNATIONAL)) + \
-                     [format_number(parsed_num, PhoneNumberFormat.E164)]
+                     self.__gen_all(format_number(parsed_num, PhoneNumberFormat.E164))
             result = list(dict.fromkeys(result))
         except Exception:
             return ScriptResponse.error(result=None, message="Something went wrong!")
