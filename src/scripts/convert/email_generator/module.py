@@ -1,30 +1,33 @@
 #!/usr/bin/env python3
-from json import loads
 from time import time
+from pathlib import Path
 
 from src.core.base.base import BaseRunner
 from src.core.utils.response import ScriptResponse
 
 
-class EmailGenerator:
-    def __init__(self, domen_base: str or None = None, serv_syms: list or None = None):
-        """
-        :param domen_base: base of email domens written in translit as text file
-        """
-        with open("settings/settings.json", "r", encoding="utf-8") as jfile:
-            data = loads(jfile.read())
-            self.__domen_base = domen_base if domen_base is not None else data["domenBase"]
-            self.__serv_syms = serv_syms if serv_syms is not None else data["serviceSymbols"]
+class DefaultValues:
+    dividers = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+    binders = ("-", "_", ".", "")
 
-    def divide(self, username: str) -> list:
+
+class EmailGenerator:
+    def __init__(self, domain_base: str = "settings/domain_base.txt"):
+        """
+        :param domain_base: base of email domains written in translit as text file
+        """
+        with open(Path(__file__).parent.joinpath(domain_base), "r") as domains:
+            self.__domains = domains.read().splitlines()
+
+    @staticmethod
+    def divide(username: str) -> list:
         """
         :param username: username to generate email
         :return: login's lexemes
         """
-        for sym in self.__serv_syms:
-            if sym != '' and username.find(sym) != -1:
-                username = username.replace(sym, '_')
-        return username.split('_')
+        for sym in DefaultValues.dividers:
+            username = username.replace(sym, " ")
+        return username.split()
 
     def generate(self, username: str) -> iter:
         """
@@ -32,14 +35,13 @@ class EmailGenerator:
         :return: iterator of person's emails
         """
         parts = self.divide(username.lower())
-        login_base = []
+        logins = []
         for i in range(2):
-            login_base.extend([sym.join(parts) for sym in self.__serv_syms])
+            logins.extend([sym.join(parts) for sym in DefaultValues.binders])
             parts.reverse()
-        for login in login_base:
-            with open(self.__domen_base, "r") as domens:
-                for domen in domens:
-                    yield f"{login}@{domen.strip()}"
+        for login in logins:
+            for domain in self.__domains:
+                yield f"{login}@{domain}"
 
 
 class Runner(BaseRunner):
@@ -65,5 +67,5 @@ class Runner(BaseRunner):
         else:
             return ScriptResponse.success(
                 result=result,
-                message=f"Successfully finished! Got {len(result)} logins, script lasted {(time() - tm):.2f} seconds"
+                message=f"Successfully finished! Got {len(result)} logins, script lasted {(time() - tm):.2f} seconds",
             )

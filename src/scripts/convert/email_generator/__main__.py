@@ -6,4 +6,4 @@ from src.core.utils.module import run_module
 from src.scripts.convert.email_generator.module import Runner
 
 result = run_module(Runner, args=argv, arg_name="username", arg_default="john.doe")
-pprint(result)
+pprint(result, compact=True)
