@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 from time import time
 from pathlib import Path
+from string import punctuation as dividers
 
 from src.core.base.base import BaseRunner
 from src.core.utils.response import ScriptResponse
 
 
 class DefaultValues:
-    dividers = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
     binders = ("-", "_", ".", "")
 
 
@@ -25,11 +25,11 @@ class EmailGenerator:
         :param username: username to generate email
         :return: login's lexemes
         """
-        for sym in DefaultValues.dividers:
+        for sym in dividers:
             username = username.replace(sym, " ")
         return username.split()
 
-    def generate(self, username: str) -> iter:
+    def generate(self, username: str) -> list:
         """
         :param username: username to generate email
         :return: iterator of person's emails
@@ -39,9 +39,11 @@ class EmailGenerator:
         for i in range(2):
             logins.extend([sym.join(parts) for sym in DefaultValues.binders])
             parts.reverse()
+        emails = set()
         for login in logins:
             for domain in self.__domains:
-                yield f"{login}@{domain}"
+                emails.add(f"{login}@{domain}")
+        return list(emails)
 
 
 class Runner(BaseRunner):
@@ -61,7 +63,7 @@ class Runner(BaseRunner):
             username = kwargs.get("username")
             if username is None:
                 raise KeyError("EmailGenerator can't work without username!")
-            result = list(email_gen.generate(username))
+            result = email_gen.generate(username)
         except Exception as err:
             return ScriptResponse.error(message=str(err))
         else:

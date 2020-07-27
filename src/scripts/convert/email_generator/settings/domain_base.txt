@@ -10,3 +10,8 @@ love.com
 icloud.com
 inbox.com
 mail.com
+ya.ru
+inbox.ru
+list.ru
+bk.ru
+mail.ru
