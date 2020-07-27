@@ -7,13 +7,10 @@ Defines basic scripts runner
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from importlib.machinery import SourceFileLoader
-from logging import basicConfig, INFO
 from pathlib import Path
 from types import ModuleType
 
 from src.core.utils.response import ScriptResponse
-
-basicConfig(level=INFO)
 
 
 class Defaults:
@@ -101,15 +98,17 @@ class ScriptRunner:
                 self.scripts[directory.stem].append(file)
         return self.scripts
 
-    def run_category(self, category: str, *args, **kwargs) -> None:
+    def run_category(self, category: str, max_workers: int = 10, *args, **kwargs) -> None:
         """
         Run a category with scripts
+        :param category: category to run
+        :param max_workers: max quantity of workers
         :return: nothing
         """
         if not self.scripts:
             self.get_scripts()
         futures = []
-        with ThreadPoolExecutor(max_workers=10) as executor:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             for script in self.scripts.get(category, []):
                 futures.append(
                     executor.submit(

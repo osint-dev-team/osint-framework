@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 
-from unittest import TestCase
-from .module import Runner
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from threading import Thread
+from unittest import TestCase
+
+from .module import Runner
+from src.core.values.defaults import TestDefaults
 
 
-class DefaultValues:
-    """
-    Set default localhost values
-    """
-
-    HOST = "127.0.0.1"
-    PORT = 1337
+DefaultValues = TestDefaults()
 
 
 class TestClassHTTPRequestHandler(BaseHTTPRequestHandler):
