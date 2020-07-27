@@ -32,7 +32,7 @@ class EmailGenerator:
     def generate(self, username: str) -> list:
         """
         :param username: username to generate email
-        :return: iterator of person's emails
+        :return: list of person's emails
         """
         parts = self.divide(username.lower())
         logins = []
