@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from time import time
 from pathlib import Path
 from string import punctuation as dividers
