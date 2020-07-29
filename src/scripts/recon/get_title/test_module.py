@@ -84,11 +84,7 @@ class GetTitleTest(TestCase):
         Test values from the local server
         :return: None
         """
-        response = self.runner.run(
-            url="http://{HOST}:{PORT}".format(
-                HOST=DefaultValues.HOST, PORT=DefaultValues.PORT
-            )
-        )
+        response = self.runner.run(url=f"http://{DefaultValues.HOST}:{DefaultValues.PORT}")
         self.assertEqual(response.get("status"), "success")
         self.assertEqual(response.get("result"), "Mock page from Mocking Class")
 
