@@ -31,7 +31,9 @@ class Runner(ReconRunner):
         api_key = kwargs.get("torrent_api_key", Defaults.API_KEY)
         if not ip:
             return ScriptResponse.error(message="No IP was provided")
-        response = get(f"https://api.antitor.com/history/peer/?ip={ip}&key={api_key}").json()
+        response = get(
+            f"https://api.antitor.com/history/peer/?ip={ip}&key={api_key}"
+        ).json()
         return ScriptResponse.success(
             message=f"Script finished for {ip}", result=response
         )
