@@ -15,7 +15,7 @@ class PossibleKeys:
     """
 
     # fmt: off
-    KEYS = ["email", "username", "fullname", "vk_api_key", "phone"]
+    KEYS = ["email", "username", "fullname", "vk_api_key", "phone", "region"]
     # fmt: on
 
 
