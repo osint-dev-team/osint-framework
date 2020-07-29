@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
 
-from unittest import TestCase
-from .module import Runner
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from threading import Thread
+from unittest import TestCase
 
+from src.core.values.defaults import TestDefaults
+from .module import Runner
 
-class DefaultValues:
-    """
-    Set default localhost values
-    """
-
-    HOST = "127.0.0.1"
-    PORT = 1337
+DefaultValues = TestDefaults()
 
 
 class TestClassHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -84,7 +79,9 @@ class GetTitleTest(TestCase):
         Test values from the local server
         :return: None
         """
-        response = self.runner.run(url=f"http://{DefaultValues.HOST}:{DefaultValues.PORT}")
+        response = self.runner.run(
+            url=f"http://{DefaultValues.HOST}:{DefaultValues.PORT}"
+        )
         self.assertEqual(response.get("status"), "success")
         self.assertEqual(response.get("result"), "Mock page from Mocking Class")
 
@@ -93,7 +90,7 @@ class GetTitleTest(TestCase):
         Test values from the remote server
         :return: None
         """
-        response = self.runner.run(url=f"https://facebook.co")
+        response = self.runner.run(url=f"https://dsakdjsalkjdkasjdlksadjlaks.co")
         self.assertEqual(response.get("status"), "error")
         response = self.runner.run(url=f"https://facebook.com")
         self.assertEqual(response.get("status"), "success")

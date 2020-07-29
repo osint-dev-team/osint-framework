@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import requests
 
 from re import search
@@ -18,15 +19,16 @@ class Runner(ReconRunner):
         :return: http title if it's exist
         """
         url = kwargs.get("url")
-        response = None
-        result = "None title or Bad url"
         try:
-            response = requests.get(url).text
+            response = requests.get(url, verify=False).text
         except Exception as get_err:
             return ScriptResponse.error(result=None, message=str(get_err))
 
         search_title = search(r"<title>(.*)</title>", response)
+        result = search_title.group(1) if search_title else None
         return ScriptResponse.success(
-            result=search_title.group(1) if search_title else None,
-            message="Title on {url} is: ".format(url=url),
+            result=result,
+            message=f"Successfully found the title for {url}"
+            if result
+            else "Can not get the title or bad url",
         )
