@@ -10,10 +10,11 @@ chardet==3.0.4
 idna==2.10
 mmh3==2.5.1
 multidict==4.7.6
+phonenumbers==8.12.7
 pycares==3.1.1
 pycparser==2.20
+PyYAML==5.3.1
 requests==2.24.0
 urllib3==1.25.9
 verify-email==2.4.1
 yarl==1.4.2
-phonenumbers~=8.12.6
