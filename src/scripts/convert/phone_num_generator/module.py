@@ -52,10 +52,14 @@ class Runner(OsintRunner):
         except Exception:
             return ScriptResponse.error(result=None, message="Something went wrong!")
         try:
-            result = self.__gen_all(format_number(parsed_num, PhoneNumberFormat.NATIONAL)) + \
-                     self.__gen_all(format_number(parsed_num, PhoneNumberFormat.INTERNATIONAL)) + \
-                     self.__gen_all(format_number(parsed_num, PhoneNumberFormat.E164))
-            result = list(dict.fromkeys(result))
+            result = [
+                phone for phone_format in [
+                    PhoneNumberFormat.NATIONAL,
+                    PhoneNumberFormat.INTERNATIONAL,
+                    PhoneNumberFormat.E164
+                ]
+                for phone in self.__gen_all(format_number(parsed_num, phone_format))
+            ]
         except Exception:
             return ScriptResponse.error(result=None, message="Something went wrong!")
 
