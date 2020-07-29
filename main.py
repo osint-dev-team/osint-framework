@@ -2,44 +2,95 @@
 
 """
 Main runner.
-
-Please, for all the searches, use the following classes:
-'BaseCase', 'OsintCase', 'ReconCase'
 """
 
-
+from logging import basicConfig, INFO
 from pprint import pprint
 
-from src.core.case.osint import OsintCase
-from src.core.case.recon import ReconCase
-from src.core.case.base import BaseCase
+from src.core.runner.manager import CaseManager
 from src.core.utils.log import Logger
 
-
+basicConfig(level=INFO)
 logger = Logger.get_logger(name="osint-framework")
 
 
-def run_case(case_class: type, *args, **kwargs):
-    """
-    Define and smoke run the BaseCase
-    :param case_class: original class of the case
-    :param args: some args
-    :param kwargs: some kwargs
-    :return: result of the execution
-    """
-    logger.info(f"start {case_class.__name__} case processing")
-    case = case_class()
-    case.process(*args, **kwargs)
-    return case.get_results()
+class DefaultValues:
+    CASES = [
+        {
+            "case": "base",
+            "name": "testname-profile",
+            "description": "Base example for 'testname' user profile",
+            "kwargs": {
+                "username": "testname",
+                "email": "testmail@gmail.com",
+                "fullname": "Test Name"
+            }
+        },
+        {
+            "case": "osint",
+            "name": "johndoe-profile",
+            "description": "Osint example for 'johndoe' user profile",
+            "kwargs": {
+                "username": "johndoe",
+                "email": "johndoe@gmail.com",
+                "fullname": "John Doe"
+            }
+        },
+        {
+            "case": "recon",
+            "name": "facebook-website",
+            "description": "Recon example for 'facebook.com' website",
+            "kwargs": {
+                "url": "https://facebook.com",
+            }
+        },
+        {
+            "case": "recon",
+            "name": "habr-website",
+            "description": "Recon example for 'habr.com' website",
+            "kwargs": {
+                "url": "https://habr.com",
+            }
+        },
+        {
+            "case": "recon",
+            "name": "8-8-8-8-host",
+            "description": "Recon example for '8.8.8.8' host",
+            "kwargs": {
+                "ip": "8.8.8.8"
+            }
+        },
+        {
+            "case": "recon",
+            "name": "13-91-95-74-host",
+            "description": "Recon example for '13.91.95.74' host",
+            "kwargs": {
+                "ip": "13.91.95.74"
+            }
+        },
+    ]
 
 
 if __name__ == "__main__":
     # fmt: off
-    base_case = run_case(case_class=BaseCase, username="johndoe", email="johndoe@gmail.com", fullname="John Doe")
-    osint_case = run_case(case_class=OsintCase, username="johndoe", email="johndoe@gmail.com", fullname="John Doe")
-    recon_case = run_case(case_class=ReconCase, url="https://facebook.com")
+    logger.info(f"Start framework for {len(DefaultValues.CASES)} cases")
 
-    pprint(base_case)
-    pprint(osint_case)
-    pprint(recon_case)
+    # Define CaseManager class
+    manager = CaseManager(cases=DefaultValues.CASES, max_workers=5)
+
+    # Run all the cases in parallel way
+    multiple_results = manager.multi_case_runner()
+    for single_result in multiple_results:
+        pprint(single_result)
+
+    # Run single case
+    single_results = manager.single_case_runner(
+        case_class="recon",
+        case_name="test single runner",
+        case_description="Nothing special",
+        url="https://habr.com/"
+    )
+
+    # Show results
+    pprint(single_results)
     # fmt: on
