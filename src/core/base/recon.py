@@ -14,7 +14,7 @@ class PossibleKeys:
     Defines default values for the function arguments (kwargs, named args)
     """
 
-    KEYS = ["host", "hostname", "ip", "url"]
+    KEYS = ["host", "hostname", "ip", "url", "torrent_api_key"]
 
 
 class ReconRunner(BaseRunner):
