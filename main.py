@@ -7,7 +7,10 @@ Main runner.
 from logging import basicConfig, INFO
 from pprint import pprint
 from yaml import safe_load
+from json import dump
 from sys import argv
+from pathlib import Path
+from datetime import datetime
 
 from src.core.runner.manager import CaseManager
 from src.core.utils.log import Logger
@@ -17,6 +20,7 @@ logger = Logger.get_logger(name="osint-framework")
 
 
 class DefaultValues:
+    RESULTS_DIR = Path("results")
     CASES = []
 
 
@@ -30,7 +34,7 @@ def run_single_case(manager: CaseManager) -> dict or list:
         case_class="recon",
         case_name="test single runner",
         case_description="Nothing special",
-        url="https://habr.com/"
+        url="https://habr.com/",
     )
 
 
@@ -49,11 +53,29 @@ def load_scenario(scenario: str or None = None) -> list:
         logger.error(msg=f"Scenario file is not available or can not be opened")
 
 
+def save_results(results: dict or list, name: str or None = "scenario") -> None:
+    """
+    Save scenario results
+    :param results: results to save
+    :param name: name to overwrite (if required)
+    :return: None
+    """
+    DefaultValues.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    current_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+    with open(
+        file=str(DefaultValues.RESULTS_DIR.joinpath(f"{name}_{current_time}.json")),
+        mode="w",
+    ) as results_file:
+        dump(results, results_file, indent=2, default=str)
+
+
 if __name__ == "__main__":
     # fmt: off
 
+    scenario_file = argv[1] if len(argv) >= 2 else None
+
     # Load scenario file
-    scenario_cases = load_scenario(scenario=argv[1] if len(argv) >= 2 else None)
+    scenario_cases = load_scenario(scenario=scenario_file)
     if not scenario_cases:
         logger.error(msg=f"Scenario file is empty. Cases is not defined")
         exit(1)
@@ -65,8 +87,9 @@ if __name__ == "__main__":
     manager = CaseManager(cases=scenario_cases, max_workers=5)
 
     # Run all the cases in parallel way
-    multiple_results = manager.multi_case_runner()
-    for single_result in multiple_results:
-        pprint(single_result)
+    multiple_results = list(manager.multi_case_runner())
+
+    # Save it
+    save_results(multiple_results, name=scenario_file.replace(".yaml", ""))
 
     # fmt: on
