@@ -12,9 +12,9 @@ class Runner(OsintRunner):
         super(Runner, self).__init__(logger)
 
     @staticmethod
-    def email_verifier(email: str = "Unknow") -> str:
-        if email == None:
-            return False
+    def email_verifier(email: str = "Unknown") -> str or None:
+        if email is None:
+            return None
         return verify_email(email)
 
     @validate_kwargs(PossibleKeys.KEYS)
