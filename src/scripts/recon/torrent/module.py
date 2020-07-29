@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-from src.core.base.osint import OsintRunner, PossibleKeys
+from requests import get
+
+from src.core.base.recon import ReconRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
 from src.core.utils.validators import validate_kwargs
-from json import loads
-from requests import get
 
 
 class Defaults:
-    API_KEY = "cc351c5a2a2c4e5ca8f215ed98200902"
+    API_KEY = "API_KEY_HERE"
 
 
-class Runner(OsintRunner):
+class Runner(ReconRunner):
     """
     Runner class is used for parsing torrents by ip.
     """

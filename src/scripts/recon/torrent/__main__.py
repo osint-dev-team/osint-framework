@@ -8,4 +8,3 @@ from .module import Runner
 
 result = run_module(Runner, args=argv, arg_name="ip", arg_default=get("https://ifconfig.me/").text)
 pprint(result)
-pprint(get("https://ifconfig.me/").text)
