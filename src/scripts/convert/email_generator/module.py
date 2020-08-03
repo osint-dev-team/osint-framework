@@ -62,7 +62,7 @@ class Runner(BaseRunner):
             tm = time()
             email_gen = EmailGenerator()
             username = kwargs.get("username")
-            if username is None:
+            if not username:
                 raise KeyError("EmailGenerator can't work without username!")
             result = email_gen.generate(username)
         except Exception as err:
