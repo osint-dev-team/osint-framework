@@ -25,7 +25,13 @@ class Runner(OsintRunner):
         :return: ScriptResponse message
         """
 
-        query = kwargs.get("email", "").replace(" ", "+")
+        query = kwargs.get("email", "")
+        if query is not str:
+            return ScriptResponse.success(
+                result=None, message=f"Can't make query. Incorrect input type (got {type(query)}, need {type('')})."
+            )
+
+        query = query.replace(" ", "+")
         url = f'https://www.google.com/search?q="{query}"'
 
         headers = {"User-Agent": Defaults.USER_AGENT}

@@ -64,3 +64,10 @@ class GoogleSearchTest(TestCase):
             response = self.runner.run(email="@gmail.com")
             self.assertIn("successfully", response.get("message"))
             self.assertGreaterEqual(len(response.get("result")), 3)
+
+    def test_unexpected_input(self) -> None:
+        """
+        Test Google search on unexpected input type
+        """
+        response = self.runner.run(email=None)
+        self.assertIn("Can't make query", response.get("message"))
