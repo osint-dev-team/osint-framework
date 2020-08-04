@@ -125,11 +125,7 @@ class Runner(OsintRunner):
         :return: path to chromedriver.
         """
 
-        return str(
-            Path().resolve()
-            / "web_drivers"
-            / ("chromedriver_" + platform.system().lower())
-        )
+        return str(Path(__file__).parents[4] / "src" / "drivers" / ("chromedriver_" + platform.system().lower()))
 
     @staticmethod
     def __get_driver_options():
