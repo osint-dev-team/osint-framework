@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import os
-import stat
 import platform
+import stat
 from pathlib import Path
 from time import sleep
 from typing import Callable, Tuple, Any, Optional
@@ -145,8 +145,12 @@ class Runner(OsintRunner):
 
         system: str = platform.system().lower()
 
-        path: str = str(Path(__file__).parents[4] / "src" / "drivers" / (
-            "chromedriver_" + system + '.exe' if system == 'windows' else ''))
+        path: str = str(
+            Path(__file__).parents[4]
+            / "src"
+            / "drivers"
+            / ("chromedriver_" + system + ".exe" if system == "windows" else "")
+        )
 
         self.__set_execution_rights(path)
 
@@ -173,9 +177,11 @@ class Runner(OsintRunner):
         :return: DOM hash.
         """
 
-        dom: Optional[Any] = self.__driver.find_elements_by_tag_name('html')[0].get_attribute('innerHTML')
+        dom: Optional[Any] = self.__driver.find_elements_by_tag_name("html")[
+            0
+        ].get_attribute("innerHTML")
 
-        return hash(dom.encode('utf-8'))
+        return hash(dom.encode("utf-8"))
 
     def __wait_page_load(self) -> None:
         """
@@ -258,7 +264,7 @@ class Runner(OsintRunner):
         except phonenumbers.NumberParseException as err_parse:
             raise phonenumbers.NumberParseException(
                 error_type=phonenumbers.NumberParseException.NOT_A_NUMBER,
-                msg="Invalid phone number!"
+                msg="Invalid phone number!",
             ) from err_parse
 
         if not phonenumbers.is_valid_number(pn):
