@@ -5,9 +5,10 @@ import stat
 import platform
 from pathlib import Path
 from time import sleep
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Any, Optional
 
 import phonenumbers
+from phonenumbers import PhoneNumber
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
@@ -127,10 +128,12 @@ class Runner(OsintRunner):
         """
         A function that sets execution rights to file.
 
+        :param path: path to file.
+
         :return: None
         """
 
-        st = os.stat(path)
+        st: os.stat_result = os.stat(path)
         os.chmod(path, st.st_mode | stat.S_IEXEC)
 
     def __get_driver_path(self) -> str:
@@ -140,9 +143,9 @@ class Runner(OsintRunner):
         :return: path to chromedriver.
         """
 
-        system = platform.system().lower()
+        system: str = platform.system().lower()
 
-        path = str(Path(__file__).parents[4] / "src" / "drivers" / (
+        path: str = str(Path(__file__).parents[4] / "src" / "drivers" / (
             "chromedriver_" + system + '.exe' if system == 'windows' else ''))
 
         self.__set_execution_rights(path)
@@ -163,18 +166,30 @@ class Runner(OsintRunner):
 
         return options
 
-    def __get_page_hash(self):
-        dom = self.__driver.find_elements_by_tag_name('html')[0].get_attribute('innerHTML')
+    def __get_page_hash(self) -> int:
+        """
+        A method that calculates current page's DOM hash.
+
+        :return: DOM hash.
+        """
+
+        dom: Optional[Any] = self.__driver.find_elements_by_tag_name('html')[0].get_attribute('innerHTML')
 
         return hash(dom.encode('utf-8'))
 
     def __wait_page_load(self) -> None:
-        page_hash = self.__get_page_hash()
-        new_page_hash = ''
+        """
+        A method that waits for page to load.
+
+        :return: None
+        """
+
+        page_hash: int = self.__get_page_hash()
+        new_page_hash: Optional[int] = None
 
         while page_hash != new_page_hash:
             page_hash = self.__get_page_hash()
-            sleep(Defaults.MAX_TIMEOUT / 1000)
+            sleep(Defaults.MAX_TIMEOUT / 100)
             new_page_hash = self.__get_page_hash()
 
     def __fill_form_field(
@@ -191,7 +206,9 @@ class Runner(OsintRunner):
         :param value: value to be put into form.
         :param max_timeout: maximum timeout in seconds.
         :param expectation_condition: visit https://selenium-python.readthedocs.io/waits.html for more information.
+
         :return: None
+
         :raises: TimeoutException: thrown when a command does not complete in enough time.
         """
 
@@ -212,7 +229,9 @@ class Runner(OsintRunner):
         :param locator: visit https://selenium-python.readthedocs.io/waits.html for more information.
         :param max_timeout: maximum timeout in seconds.
         :param expectation_condition: visit https://selenium-python.readthedocs.io/waits.html for more information.
+
         :return: None
+
         :raises: TimeoutException: thrown when a command does not complete in enough time.
         """
 
@@ -222,15 +241,20 @@ class Runner(OsintRunner):
         elem.click()
 
     @staticmethod
-    def __split_phone_number(phone_number: str):
+    def __split_phone_number(phone_number: str) -> Tuple[str, str]:
         """
         A function that splits phone number into country code and national number.
 
-        : param phone_number: phone number in international format.
+        :param phone_number: phone number in international format.
+
+        :return: a tuple consisting of country code and national number.
+
+        :raises: phonenumbers.NumberParseException: thrown when the attempt to parse the phone number failed.
+        :raises: ValueError: thrown when the provided phone number is invalid.
         """
 
         try:
-            pn = phonenumbers.parse(phone_number)
+            pn: PhoneNumber = phonenumbers.parse(phone_number)
         except phonenumbers.NumberParseException as err_parse:
             raise phonenumbers.NumberParseException(
                 error_type=phonenumbers.NumberParseException.NOT_A_NUMBER,
