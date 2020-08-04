@@ -28,7 +28,8 @@ class Runner(OsintRunner):
         query = kwargs.get("email", "")
         if query is not str:
             return ScriptResponse.success(
-                result=None, message=f"Can't make query. Incorrect input type (got {type(query)}, need {type('')})."
+                result=None,
+                message=f"Can't make query. Incorrect input type (got {type(query)}, need {type('')}).",
             )
 
         query = query.replace(" ", "+")
@@ -40,11 +41,13 @@ class Runner(OsintRunner):
 
         if resp.status_code == 413:
             return ScriptResponse.success(
-                result=None, message=f"Can't make query. Request is too long. Server response: {resp.status_code}."
+                result=None,
+                message=f"Can't make query. Request is too long. Server response: {resp.status_code}.",
             )
         elif resp.status_code != 200:
             return ScriptResponse.success(
-                result=None, message=f"Can't make query. Server response: {resp.status_code}."
+                result=None,
+                message=f"Can't make query. Server response: {resp.status_code}.",
             )
 
         soup = BeautifulSoup(resp.content, "html.parser")
