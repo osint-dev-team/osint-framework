@@ -5,7 +5,7 @@ import stat
 import platform
 from pathlib import Path
 from time import sleep
-from typing import Tuple
+from typing import Callable, Tuple
 
 import phonenumbers
 from selenium import webdriver
@@ -82,7 +82,7 @@ class Runner(OsintRunner):
         WebDriverWait(self.__driver, Defaults.MAX_TIMEOUT).until(
             ec.url_changes(Constants.FINISH_URL)
         )
-        sleep(1)
+        self.__wait_page_load()
 
         # we need to choose necessary country code
         # first, we need to click dropdown button to get access to all VK country codes
@@ -103,7 +103,7 @@ class Runner(OsintRunner):
 
         self.__fill_form_field((By.ID, "join_phone"), phone_number)
         self.__click_elem((By.ID, "join_send_phone"))
-        sleep(1)
+        self.__wait_page_load()
 
         try:
             WebDriverWait(self.__driver, Defaults.MAX_TIMEOUT).until(
@@ -163,12 +163,26 @@ class Runner(OsintRunner):
 
         return options
 
+    def __get_page_hash(self):
+        dom = self.__driver.find_elements_by_tag_name('html')[0].get_attribute('innerHTML')
+
+        return hash(dom.encode('utf-8'))
+
+    def __wait_page_load(self) -> None:
+        page_hash = self.__get_page_hash()
+        new_page_hash = ''
+
+        while page_hash != new_page_hash:
+            page_hash = self.__get_page_hash()
+            sleep(Defaults.MAX_TIMEOUT / 1000)
+            new_page_hash = self.__get_page_hash()
+
     def __fill_form_field(
         self,
         locator: Tuple[str, str],
         value,
         max_timeout: float = Defaults.MAX_TIMEOUT,
-        expectation_condition: callable = ec.presence_of_element_located,
+        expectation_condition: Callable = ec.presence_of_element_located,
     ) -> None:
         """
         A safe method to fill form field. It uses expectation condition to check if element is ready for interaction.
@@ -190,7 +204,7 @@ class Runner(OsintRunner):
         self,
         locator: Tuple[str, str],
         max_timeout: float = Defaults.MAX_TIMEOUT,
-        expectation_condition: callable = ec.element_to_be_clickable,
+        expectation_condition: Callable = ec.element_to_be_clickable,
     ) -> None:
         """
         A safe method to click on element. It uses expectation condition to check if element is ready for interaction.
