@@ -10,6 +10,7 @@ from typing import Tuple
 import phonenumbers
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
@@ -149,8 +150,14 @@ class Runner(OsintRunner):
         return path
 
     @staticmethod
-    def __get_driver_options():
-        options: webdriver.chrome.options.Options = webdriver.ChromeOptions()
+    def __get_driver_options() -> Options:
+        """
+        A function that constructs options for webdriver, such as language and headless mode.
+
+        :return: webdriver options.
+        """
+
+        options: Options = webdriver.ChromeOptions()
         options.add_experimental_option("prefs", {"intl.accept_languages": "en,en_US"})
         options.add_argument("headless")
 
@@ -201,7 +208,13 @@ class Runner(OsintRunner):
         elem.click()
 
     @staticmethod
-    def __split_phone_number(phone_number):
+    def __split_phone_number(phone_number: str):
+        """
+        A function that splits phone number into country code and national number.
+
+        : param phone_number: phone number in international format.
+        """
+
         try:
             pn = phonenumbers.parse(phone_number)
         except phonenumbers.NumberParseException as err_parse:
