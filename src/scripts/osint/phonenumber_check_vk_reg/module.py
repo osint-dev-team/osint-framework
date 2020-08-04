@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import os
+import stat
 import platform
 from pathlib import Path
 from time import sleep
@@ -108,24 +110,43 @@ class Runner(OsintRunner):
             )
 
             self.__driver.quit()
+
             return ScriptResponse.success(
                 message="There is a user with such phone number!"
             )
         except TimeoutException:
             self.__driver.quit()
+
             return ScriptResponse.success(
                 message="User with such phone number doesn't exist!"
             )
 
     @staticmethod
-    def __get_driver_path() -> str:
+    def __set_execution_rights(path: str) -> None:
+        """
+        A function that sets execution rights to file.
+
+        :return: None
+        """
+
+        st = os.stat(path)
+        os.chmod(path, st.st_mode | stat.S_IEXEC)
+
+    def __get_driver_path(self) -> str:
         """
         A method that returns path to chromedriver (with considering OS).
 
         :return: path to chromedriver.
         """
 
-        return str(Path(__file__).parents[4] / "src" / "drivers" / ("chromedriver_" + platform.system().lower()))
+        system = platform.system().lower()
+
+        path = str(Path(__file__).parents[4] / "src" / "drivers" / (
+            "chromedriver_" + system + '.exe' if system == 'windows' else ''))
+
+        self.__set_execution_rights(path)
+
+        return path
 
     @staticmethod
     def __get_driver_options():
@@ -185,7 +206,8 @@ class Runner(OsintRunner):
             pn = phonenumbers.parse(phone_number)
         except phonenumbers.NumberParseException as err_parse:
             raise phonenumbers.NumberParseException(
-                "Invalid phone number!"
+                error_type=phonenumbers.NumberParseException.NOT_A_NUMBER,
+                msg="Invalid phone number!"
             ) from err_parse
 
         if not phonenumbers.is_valid_number(pn):
