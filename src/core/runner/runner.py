@@ -10,7 +10,11 @@ from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from types import ModuleType
 
+import urllib3
+
 from src.core.utils.response import ScriptResponse
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class Defaults:

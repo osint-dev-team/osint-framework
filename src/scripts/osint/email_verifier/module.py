@@ -11,10 +11,16 @@ class Runner(OsintRunner):
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 
+    @staticmethod
+    def email_verifier(email: str = "Unknown") -> bool or None:
+        if email is None:
+            return False
+        return verify_email(email)
+
     @validate_kwargs(PossibleKeys.KEYS)
     def run(self, *args, **kwargs) -> ScriptResponse.success or ScriptResponse.error:
         email = kwargs.get("email")
-        result = verify_email(email)
+        result = self.email_verifier(email)
         if not result:
             return ScriptResponse.success(
                 result=result, message=f"Sorry, email {email} does not exist"

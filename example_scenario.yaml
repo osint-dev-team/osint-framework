@@ -1,0 +1,29 @@
+- case: base
+  name: testname-profile
+  description: Base example for 'testname' user profile
+  kwargs:
+    username: testname
+    email: testmail@gmail.com
+    fullname: Test Name
+- case: osint
+  name: johndoe-profile
+  description: Osint example for 'johndoe' user profile
+  kwargs:
+    username: johndoe
+    email: johndoe@gmail.com
+    fullname: John Doe
+- case: recon
+  name: facebook-website
+  description: Recon example for 'facebook.com' website
+  kwargs:
+    url: https://facebook.com
+- case: recon
+  name: 8-8-8-8-host
+  description: Recon example for '8.8.8.8' host
+  kwargs:
+    ip: 8.8.8.8
+- case: recon
+  name: 13-91-95-74-host
+  description: Recon example for '13.91.95.74' host
+  kwargs:
+    ip: 13.91.95.74
