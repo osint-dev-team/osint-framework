@@ -62,6 +62,10 @@ class CaseManager:
             "case_class": self.MAPPING.get(case_class, "default").__name__,
             "case_name": case_name,
             "case_description": case_description,
+            "case_data": {
+                "args": args,
+                "kwargs": kwargs
+            },
             "case_results": case.get_results() or {},
         }
 
