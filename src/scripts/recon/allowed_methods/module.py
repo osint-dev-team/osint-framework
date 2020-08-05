@@ -53,6 +53,11 @@ def get_random_method():
 
 
 class Runner(ReconRunner):
+    """
+    Class that performs allowed methods check
+    """
+    required = ["url"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 

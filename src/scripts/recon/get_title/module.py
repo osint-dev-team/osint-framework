@@ -8,6 +8,11 @@ from src.core.utils.response import ScriptResponse
 
 
 class Runner(ReconRunner):
+    """
+    Class that performs HTTP title checking
+    """
+    required = ["url"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 

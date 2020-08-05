@@ -8,6 +8,11 @@ from src.core.utils.validators import validate_kwargs
 
 
 class Runner(OsintRunner):
+    """
+    Class that performs email verification
+    """
+    required = ["email"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 
