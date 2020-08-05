@@ -27,3 +27,8 @@
   description: Recon example for '13.91.95.74' host
   kwargs:
     ip: 13.91.95.74
+- case: osint
+  name: phone-check
+  description: check information about the phone number
+  kwargs:
+    phone: 89138111111
