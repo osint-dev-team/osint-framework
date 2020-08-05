@@ -35,11 +35,11 @@ class ScriptRunner:
 
     @staticmethod
     def exec_script(
-            path: str or Path,
-            script_class: str = "Runner",
-            function: str = "run",
-            args: list or None = None,
-            kwargs: dict or None = None,
+        path: str or Path,
+        script_class: str = "Runner",
+        function: str = "run",
+        args: list or None = None,
+        kwargs: dict or None = None,
     ) -> ScriptResponse or dict:
         """
         Load and exec python script
