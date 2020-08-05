@@ -12,6 +12,7 @@ from types import ModuleType
 import urllib3
 
 from src.core.utils.response import ScriptResponse
+from src.core.values.defaults import CoreDefaults
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -34,11 +35,11 @@ class ScriptRunner:
 
     @staticmethod
     def exec_script(
-        path: str or Path,
-        script_class: str = "Runner",
-        function: str = "run",
-        args: list or None = None,
-        kwargs: dict or None = None,
+            path: str or Path,
+            script_class: str = "Runner",
+            function: str = "run",
+            args: list or None = None,
+            kwargs: dict or None = None,
     ) -> ScriptResponse or dict:
         """
         Load and exec python script
@@ -106,7 +107,14 @@ class ScriptRunner:
                 self.scripts[directory.stem].append(file)
         return self.scripts
 
-    def run_category(self, category: str, max_workers: int = 10, timeout: int = 5 * 60, *args, **kwargs) -> None:
+    def run_category(
+        self,
+        category: str,
+        max_workers: int = CoreDefaults.MAX_THREADS,
+        timeout: int = CoreDefaults.CASE_TIMEOUT,
+        *args,
+        **kwargs
+    ) -> None:
         """
         Run a category with scripts
         :param category: category to run

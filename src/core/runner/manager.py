@@ -10,6 +10,7 @@ from src.core.case.base import BaseCase
 from src.core.case.osint import OsintCase
 from src.core.case.recon import ReconCase
 from src.core.utils.log import Logger
+from src.core.values.defaults import CoreDefaults
 
 logger = Logger.get_logger(name=__name__)
 
@@ -26,7 +27,7 @@ class CaseManager:
         "default": BaseCase,
     }
 
-    def __init__(self, cases: list or None = None, max_workers: int = 10):
+    def __init__(self, cases: list or None = None, max_workers: int = CoreDefaults.MAX_PROCESSES):
         """
         Init manager
         :param cases: cases to run
