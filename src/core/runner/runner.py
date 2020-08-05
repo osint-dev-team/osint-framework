@@ -76,7 +76,11 @@ class ScriptRunner:
 
         # fmt: off
         try:
-            class_instance = getattr(module, script_class)(logger=path.parent.stem)
+            module_class = getattr(module, script_class)
+            applicable = set(module_class.required).intersection(kwargs.keys())
+            if not applicable:
+                return
+            class_instance = module_class(logger=path.parent.stem)
             result.update(getattr(class_instance, function)(*args, **kwargs))
         except Exception as unexp_err:
             result.update(ScriptResponse.error(message=f"Unexpected execution error: {str(unexp_err)}"))
@@ -117,6 +121,8 @@ class ScriptRunner:
             ]
         for future in as_completed(futures):
             result = future.result()
+            if not result:
+                continue
             self.results.update({result.get("script"): result})
 
     def get_results(self) -> dict:
