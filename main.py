@@ -66,7 +66,7 @@ def save_results(results: dict or list, name: str or None = "scenario") -> None:
         file=str(DefaultValues.RESULTS_DIR.joinpath(f"{name}_{current_time}.json")),
         mode="w",
     ) as results_file:
-        dump(results, results_file, indent=2, default=str)
+        dump(results, results_file, indent=2, default=str, ensure_ascii=False)
 
 
 if __name__ == "__main__":
