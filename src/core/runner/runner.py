@@ -78,6 +78,7 @@ class ScriptRunner:
         try:
             module_class = getattr(module, script_class)
             applicable = set(module_class.required).intersection(kwargs.keys())
+            # If the current script is not applicable for the current set of arguments - skip it
             if not applicable:
                 return
             class_instance = module_class(logger=path.parent.stem)
@@ -105,11 +106,12 @@ class ScriptRunner:
                 self.scripts[directory.stem].append(file)
         return self.scripts
 
-    def run_category(self, category: str, max_workers: int = 10, *args, **kwargs) -> None:
+    def run_category(self, category: str, max_workers: int = 10, timeout: int = 5 * 60, *args, **kwargs) -> None:
         """
         Run a category with scripts
         :param category: category to run
         :param max_workers: max quantity of workers
+        :param timeout: timeout to wait in seconds
         :return: nothing
         """
         if not self.scripts:
@@ -119,11 +121,15 @@ class ScriptRunner:
                 executor.submit(self.exec_script, path=script, args=args, kwargs=kwargs)
                 for script in self.scripts.get(category, [])
             ]
-        for future in as_completed(futures):
-            result = future.result()
-            if not result:
-                continue
-            self.results.update({result.get("script"): result})
+        try:
+            for future in as_completed(futures, timeout=timeout):
+                result = future.result()
+                if not result:
+                    continue
+                self.results.update({result.get("script"): result})
+        except TimeoutError:
+            # Tasks took too much time - kill the execution process and return empty results
+            self.results = {}
 
     def get_results(self) -> dict:
         """
