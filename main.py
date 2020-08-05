@@ -84,7 +84,7 @@ if __name__ == "__main__":
     logger.info(f"Start framework for {len(scenario_cases)} cases")
 
     # Define CaseManager class
-    manager = CaseManager(cases=scenario_cases, max_workers=5)
+    manager = CaseManager(cases=scenario_cases)
 
     # Run all the cases in parallel way
     multiple_results = list(manager.multi_case_runner())
