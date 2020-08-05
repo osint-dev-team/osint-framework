@@ -26,7 +26,7 @@ class CaseManager:
         "default": BaseCase,
     }
 
-    def __init__(self, cases: list or None = None, max_workers: int = 5):
+    def __init__(self, cases: list or None = None, max_workers: int = 10):
         """
         Init manager
         :param cases: cases to run
