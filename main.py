@@ -4,13 +4,13 @@
 Main runner.
 """
 
-from logging import basicConfig, INFO
-from pprint import pprint
-from yaml import safe_load
-from json import dump
-from sys import argv
-from pathlib import Path
 from datetime import datetime
+from json import dump
+from logging import basicConfig, INFO
+from pathlib import Path
+from sys import argv
+
+from yaml import safe_load
 
 from src.core.runner.manager import CaseManager
 from src.core.utils.log import Logger
