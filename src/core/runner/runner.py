@@ -4,8 +4,7 @@
 Defines basic scripts runner
 """
 
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from types import ModuleType
@@ -111,17 +110,12 @@ class ScriptRunner:
         """
         if not self.scripts:
             self.get_scripts()
-        futures = []
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            for script in self.scripts.get(category, []):
-                futures.append(
-                    executor.submit(
-                        fn=partial(
-                            self.exec_script, path=script, args=args, kwargs=kwargs
-                        )
-                    )
-                )
-        for future in futures:
+            futures = [
+                executor.submit(self.exec_script, path=script, args=args, kwargs=kwargs)
+                for script in self.scripts.get(category, [])
+            ]
+        for future in as_completed(futures):
             result = future.result()
             self.results.update({result.get("script"): result})
 
