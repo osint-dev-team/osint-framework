@@ -48,6 +48,11 @@ class EmailGenerator:
 
 
 class Runner(BaseRunner):
+    """
+    Class that generates different email addresses
+    """
+    required = ["username"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 

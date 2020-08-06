@@ -7,6 +7,12 @@ Set default values
 from random import randrange
 
 
+class CoreDefaults:
+    MAX_PROCESSES = 10
+    MAX_THREADS = 10
+    CASE_TIMEOUT = 5 * 60
+
+
 class TestDefaults:
     HOST = "127.0.0.1"
     DOWN_TIMEOUT = 0.1

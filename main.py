@@ -4,13 +4,13 @@
 Main runner.
 """
 
-from logging import basicConfig, INFO
-from pprint import pprint
-from yaml import safe_load
-from json import dump
-from sys import argv
-from pathlib import Path
 from datetime import datetime
+from json import dump
+from logging import basicConfig, INFO
+from pathlib import Path
+from sys import argv
+
+from yaml import safe_load
 
 from src.core.runner.manager import CaseManager
 from src.core.utils.log import Logger
@@ -66,7 +66,7 @@ def save_results(results: dict or list, name: str or None = "scenario") -> None:
         file=str(DefaultValues.RESULTS_DIR.joinpath(f"{name}_{current_time}.json")),
         mode="w",
     ) as results_file:
-        dump(results, results_file, indent=2, default=str)
+        dump(results, results_file, indent=2, default=str, ensure_ascii=False)
 
 
 if __name__ == "__main__":
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     logger.info(f"Start framework for {len(scenario_cases)} cases")
 
     # Define CaseManager class
-    manager = CaseManager(cases=scenario_cases, max_workers=5)
+    manager = CaseManager(cases=scenario_cases)
 
     # Run all the cases in parallel way
     multiple_results = list(manager.multi_case_runner())

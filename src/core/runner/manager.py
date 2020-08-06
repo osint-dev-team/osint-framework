@@ -4,13 +4,13 @@
 Defines multiprocessing manager
 """
 
-from concurrent.futures import ProcessPoolExecutor
-from functools import partial
-from src.core.utils.log import Logger
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from src.core.case.base import BaseCase
 from src.core.case.osint import OsintCase
 from src.core.case.recon import ReconCase
+from src.core.utils.log import Logger
+from src.core.values.defaults import CoreDefaults
 
 logger = Logger.get_logger(name=__name__)
 
@@ -27,7 +27,7 @@ class CaseManager:
         "default": BaseCase,
     }
 
-    def __init__(self, cases: list or None = None, max_workers: int = 3):
+    def __init__(self, cases: list or None = None, max_workers: int = CoreDefaults.MAX_PROCESSES):
         """
         Init manager
         :param cases: cases to run
@@ -62,6 +62,10 @@ class CaseManager:
             "case_class": self.MAPPING.get(case_class, "default").__name__,
             "case_name": case_name,
             "case_description": case_description,
+            "case_data": {
+                "args": args,
+                "kwargs": kwargs
+            },
             "case_results": case.get_results() or {},
         }
 
@@ -74,22 +78,18 @@ class CaseManager:
         :param max_workers: maximum processes
         :return: results
         """
-        futures = []
         with ProcessPoolExecutor(
             max_workers=max_workers or self.max_workers
         ) as executor:
-            for case in cases or self.cases:
-                futures.append(
-                    executor.submit(
-                        partial(
-                            self.single_case_runner,
-                            case_class=case.get("case"),
-                            case_name=case.get("name"),
-                            case_description=case.get("description"),
-                            *case.get("args", []),
-                            **case.get("kwargs", {}),
-                        )
-                    )
-                )
-        for future in futures:
+            futures = [
+                executor.submit(
+                    self.single_case_runner,
+                    case_class=case.get("case"),
+                    case_name=case.get("name"),
+                    case_description=case.get("description"),
+                    *case.get("args", []),
+                    **case.get("kwargs", {}),
+                ) for case in cases or self.cases
+            ]
+        for future in as_completed(futures):
             yield future.result()

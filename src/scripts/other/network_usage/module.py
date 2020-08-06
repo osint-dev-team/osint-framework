@@ -7,6 +7,11 @@ from requests.utils import CaseInsensitiveDict
 
 
 class Runner(ReconRunner):
+    """
+    Simple example module to returh headers
+    """
+    required = ["hostname"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 

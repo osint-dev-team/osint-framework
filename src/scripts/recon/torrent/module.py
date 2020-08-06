@@ -15,6 +15,7 @@ class Runner(ReconRunner):
     """
     Runner class is used for parsing torrents by ip.
     """
+    required = ["ip"]
 
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)

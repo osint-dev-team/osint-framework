@@ -11,6 +11,7 @@ class Runner(ReconRunner):
     """
     Class that performs cookie flags checking.
     """
+    required = ["url"]
 
     def __init__(self, logger: str = __name__):
         """

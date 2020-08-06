@@ -10,6 +10,11 @@ from src.core.utils.validators import validate_kwargs
 
 
 class Runner(ReconRunner):
+    """
+    Class that performs IP information check
+    """
+    required = ["ip"]
+
     def __init__(self, logger: str = __name__) -> None:
         super(Runner, self).__init__(logger)
         self.__BASE_URL = "http://ip-api.com/json/{query}?fields=18411513"

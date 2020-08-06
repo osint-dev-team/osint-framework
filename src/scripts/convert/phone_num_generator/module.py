@@ -7,6 +7,11 @@ from src.core.utils.validators import validate_kwargs
 
 
 class Runner(OsintRunner):
+    """
+    Class that generates different phone numbers
+    """
+    required = ["phone", "region"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 

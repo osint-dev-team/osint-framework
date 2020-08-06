@@ -20,6 +20,8 @@ class PossibleKeys:
 
 
 class OsintRunner(BaseRunner):
+    required = []
+
     def __init__(self, logger: str = __name__):
         super(OsintRunner, self).__init__(logger)
 
