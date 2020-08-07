@@ -55,7 +55,7 @@ async def check_nickname_async(nickname: str, social) -> list:
         while not social.empty():
             url = await social.get()
             try:
-                async with session.get(url) as response:
+                async with session.get(url, timeout=5) as response:
                     if response.status == 200:
                         ans.append(url)
             except:
@@ -71,10 +71,14 @@ class Runner(OsintRunner):
     async def __run(*args, **kwargs):
         try:
             username = kwargs.get("username")
-            check_letters = "_"+string.ascii_uppercase+string.ascii_lowercase+string.digits
+            check_letters = (
+                "_" + string.ascii_uppercase + string.ascii_lowercase + string.digits
+            )
             for i in username:
                 if i not in check_letters:
-                    return ScriptResponse.error(message="Invalid character {i}".format(i=i))
+                    return ScriptResponse.error(
+                        message="Invalid character {i}".format(i=i)
+                    )
             social = asyncio.Queue()
             for site in Networks().net:
                 await social.put(

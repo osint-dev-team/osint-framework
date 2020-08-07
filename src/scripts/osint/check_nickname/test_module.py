@@ -8,10 +8,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from threading import Thread
 
 
-
 class NicknameCheckTest(TestCase):
-
-
     def setUp(self):
         """
         Setup something before each test function
@@ -38,6 +35,11 @@ class NicknameCheckTest(TestCase):
         self.assertEqual(response.get("status"), "success")
         for i in range(3, 10):
             for j in range(5):
-                s = ''.join(choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(i))
+                s = "".join(
+                    choice(
+                        string.ascii_lowercase + string.ascii_uppercase + string.digits
+                    )
+                    for _ in range(i)
+                )
                 response = self.runner.run(username=s)
                 self.assertEqual(response.get("status"), "success")

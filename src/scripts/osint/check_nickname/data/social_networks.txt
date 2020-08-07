@@ -7,6 +7,6 @@ mastodon.social/@
 flickr.com/photos/
 gab.com/
 ficwad.com/a/
-#www.opendiary.com/m/author/
+www.opendiary.com/m/author/
 
 
