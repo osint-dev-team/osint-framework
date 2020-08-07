@@ -2,7 +2,7 @@
 from time import sleep
 
 from requests import get
-from random import uniform, randint
+from random import randint
 from bs4 import BeautifulSoup
 
 from src.core.base.osint import OsintRunner, PossibleKeys
