@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-
+from concurrent.futures import as_completed
+from concurrent.futures.thread import ThreadPoolExecutor
+from time import sleep
 from unittest import TestCase
 from random import seed, choice
 from string import ascii_uppercase
@@ -58,12 +60,16 @@ class GoogleSearchTest(TestCase):
 
     def test_multiple_requests(self) -> None:
         """
-        Test Google search on multiple consequent requests
+        Test Google search on multiple parallel requests
         """
-        for _ in range(20):
-            response = self.runner.run(email="@gmail.com")
-            self.assertIn("successfully", response.get("message"))
-            self.assertGreaterEqual(len(response.get("result")), 3)
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = {
+                executor.submit(self.runner.run, email="@gmail.com") for _ in range(10)
+            }
+        for future in as_completed(futures):
+            print(future.result().get("message"))
+            self.assertIn("successfully", future.result().get("message"))
+            self.assertGreaterEqual(len(future.result().get("result")), 3)
 
     def test_unexpected_input(self) -> None:
         """
