@@ -5,7 +5,7 @@ from pathlib import Path
 
 import aiohttp
 import requests
-
+import string
 from src.core.base.osint import OsintRunner
 from src.core.utils.response import ScriptResponse
 
@@ -71,6 +71,10 @@ class Runner(OsintRunner):
     async def __run(*args, **kwargs):
         try:
             username = kwargs.get("username")
+            check_letters = "_"+string.ascii_uppercase+string.ascii_lowercase+string.digits
+            for i in username:
+                if i not in check_letters:
+                    return ScriptResponse.error(message="Invalid character {i}".format(i=i))
             social = asyncio.Queue()
             for site in Networks().net:
                 await social.put(
