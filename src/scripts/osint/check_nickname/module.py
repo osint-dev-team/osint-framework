@@ -71,14 +71,11 @@ class Runner(OsintRunner):
     async def __run(*args, **kwargs):
         try:
             username = kwargs.get("username")
-            check_letters = (
-                "_" + string.ascii_uppercase + string.ascii_lowercase + string.digits
-            )
-            for i in username:
-                if i not in check_letters:
-                    return ScriptResponse.error(
-                        message="Invalid character {i}".format(i=i)
-                    )
+            bad_symbols = list(set(username).intersection(string.punctuation))
+            if bad_symbols:
+                return ScriptResponse.error(
+                    message=f"Invalid characters: {', '.join(bad_symbols)}"
+                )
             social = asyncio.Queue()
             for site in Networks().net:
                 await social.put(

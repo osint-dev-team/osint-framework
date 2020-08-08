@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 from .module import Runner
-from random import choice
+from random import choice, randrange
 import string
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from threading import Thread
@@ -24,22 +24,28 @@ class NicknameCheckTest(TestCase):
         self.assertIsNotNone(self.runner)
         self.assertIsInstance(self.runner, Runner)
 
+    def test_nicknames(self) -> None:
+        """
+        Tests  different usernames with random acceptable
+         characters
+        :return: None
+        """
+        response = self.runner.run(username="")
+        self.assertEqual(response.get("status"), "success")
+        for _ in range(5):
+            nickname = "".join(choice(string.ascii_letters) for _ in range(randrange(5, 10)))
+            response = self.runner.run(username=nickname)
+            self.assertEqual(response.get("status"), "success")
+
     def test_special_nicknames(self) -> None:
         """
-        Test values from the remote server
-        :return: None
+        Tests  not acceptable characters in username
+         and not acceptable formats of the stdin
+        :return:
         """
         response = self.runner.run(username=None)
         self.assertEqual(response.get("status"), "error")
-        response = self.runner.run(username="")
-        self.assertEqual(response.get("status"), "success")
-        for i in range(3, 10):
-            for j in range(5):
-                s = "".join(
-                    choice(
-                        string.ascii_lowercase + string.ascii_uppercase + string.digits
-                    )
-                    for _ in range(i)
-                )
-                response = self.runner.run(username=s)
-                self.assertEqual(response.get("status"), "success")
+        for _ in range(5):
+            nickname = ''.join(choice(string.punctuation) for _ in range(randrange(3,5)))
+            response = self.runner.run(username=nickname)
+            self.assertEqual(response.get("status"), "error")
