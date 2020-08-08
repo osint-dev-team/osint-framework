@@ -215,6 +215,7 @@ class AllowedMethodsFailTest(TestCase):
             :return: results of the original 'runner.run' function
             """
             import src.scripts.recon.allowed_methods.module
+
             original_request = src.scripts.recon.allowed_methods.module.request
 
             def patch_request(*_args, **_kwargs):
@@ -224,7 +225,9 @@ class AllowedMethodsFailTest(TestCase):
                 :param _kwargs: original kwargs
                 :return: patched request
                 """
-                return original_request(*_args, **_kwargs, timeout=DefaultValues.DOWN_TIMEOUT)
+                return original_request(
+                    *_args, **_kwargs, timeout=DefaultValues.DOWN_TIMEOUT
+                )
 
             # Wrap runner in timeout request
             src.scripts.recon.allowed_methods.module.request = patch_request

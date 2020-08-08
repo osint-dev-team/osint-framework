@@ -127,6 +127,7 @@ class FaviconHashFailTest(TestCase):
             :return: results of the original 'runner.run' function
             """
             import src.scripts.recon.shodan_favicon_hash.module
+
             original_request = src.scripts.recon.shodan_favicon_hash.module.get
 
             def patch_request(*_args, **_kwargs):
@@ -136,7 +137,9 @@ class FaviconHashFailTest(TestCase):
                 :param _kwargs: original kwargs
                 :return: patched request
                 """
-                return original_request(*_args, **_kwargs, timeout=DefaultValues.DOWN_TIMEOUT)
+                return original_request(
+                    *_args, **_kwargs, timeout=DefaultValues.DOWN_TIMEOUT
+                )
 
             # Wrap runner in timeout request
             src.scripts.recon.shodan_favicon_hash.module.get = patch_request
