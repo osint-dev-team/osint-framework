@@ -13,17 +13,14 @@ _First of all: provide some arguments in the `main.py` file to collect informati
 
 To run the framework:
 ```bash
-python3 main.py
+python3 main.py example_scenario.yaml
 ```
 To run the tests:
 ```bash
 chmod +x run_tests.sh
 ./run_tests.sh
 ```
-_or you can run them like this, of course:_
-```bash
-python3 -m unittest discover -v
-```
+
 ## Running as a separated module
 Basic:
 ```python3
@@ -51,10 +48,11 @@ Use the following structure:
 2. Provide the following structure of your script directory:
 ```
 your_script_name
-├── __init__.py     - use this module to set the default parent directory (you can copy this file from any other script)
-├── __main__.py     - use this module to provide some basic interface to use your script as a module (the same as if __name__ == "__main__")
-├── module.py       - use this module to describe the basic logic of your module (you can import it in the __main__.py to provide interface)
-└── test_module.py  - use this module for unittest tests
+├── requirements.txt - provide required libraries
+├── __init__.py      - use this module to set the default parent directory (you can copy this file from any other script)
+├── __main__.py      - use this module to provide some basic interface to use your script as a module (the same as if __name__ == "__main__")
+├── module.py        - use this module to describe the basic logic of your module (you can import it in the __main__.py to provide interface)
+└── test_module.py   - use this module for unittest tests
 ```
 3. Create the `__init__.py` file. An example of the `__init__.py` boilerplate structure can be seen below:
 ```python3
@@ -103,6 +101,9 @@ class Runner(OsintRunner):
     """
     Basic script example
     """
+    
+    # Define required arguments here 
+    required = ["my_argument"]
 
     def __init__(self, logger: str = __name__):
         """
@@ -114,6 +115,7 @@ class Runner(OsintRunner):
         """
         super(Runner, self).__init__(logger)
 
+    # Validate input arguments (if you need some validation)
     @validate_kwargs(PossibleKeys.KEYS)
     def run(self, *args, **kwargs) -> ScriptResponse.success or ScriptResponse.error:
         """
@@ -126,6 +128,7 @@ class Runner(OsintRunner):
         :return: ScriptResponse message (error or success)
         """
         argument = kwargs.get("my_argument", "Arguments were not provided!")
+        ...
         return ScriptResponse.success(message=f"Script finished with argument {argument}")
 ```
 6. For `test_module.py` you can use any required tests (as you wish). A test case for your module is required to keep the project clean.
