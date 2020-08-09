@@ -91,6 +91,15 @@ class TaskItem:
         self.datetime_finish = datetime.now()
         self.message = msg
 
+    def set_pending(self, msg: str) -> None:
+        """
+        Define pending status
+        :param msg: additional info
+        :return: None
+        """
+        self.status = TaskStatus.PENDING
+        self.message = msg
+
     def as_json(self) -> dict:
         """
         Implement str cast representation to dump data
