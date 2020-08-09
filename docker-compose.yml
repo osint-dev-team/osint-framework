@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  db:
+    container_name: osint-framework-db
+    image: postgres:alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: pass1234
+      POSTGRES_USER: admin1234
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    networks:
+      - postgres
+    ports:
+      - "127.0.0.1:5432:5432"
+  pgadmin:
+    container_name: osint-framework-pgadmin
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+       - pgadmin:/root/.pgadmin
+    networks:
+      - postgres
+    ports:
+      - "80:80"
+networks:
+  postgres:
+    driver: bridge
+volumes:
+    postgres:
+    pgadmin:
