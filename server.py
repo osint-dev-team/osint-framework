@@ -79,7 +79,7 @@ class CreateTaskHandler(BaseHandler, ABC):
             body = json_decode(self.request.body)
             task = TaskItem()
             TaskCrud.create_task(task=task)
-            TaskSpawner.run_task(task, body)
+            TaskSpawner().run_task(task, body)
             response = json_encode(task.as_json())
         except Exception as create_task_err:
             return self.error(msg=f"Unexpected error at task creating: {str(create_task_err)}")
@@ -103,6 +103,23 @@ class ListTaskHandler(BaseHandler, ABC):
         return self.write(tasks)
 
 
+class ResultsHandler(BaseHandler, ABC):
+    """
+    Return results
+    """
+    def get(self) -> None:
+        """
+        Return results data
+        :return: None
+        """
+        try:
+            task_id = self.get_argument("task_id", None)
+            results = json_encode(TaskCrud.get_results(task_id))
+        except Exception as get_results_error:
+            return self.error(msg=f"Unexpected error at getting results: {str(get_results_error)}")
+        return self.write(results)
+
+
 def make_app() -> Application:
     """
     Create application
@@ -111,7 +128,8 @@ def make_app() -> Application:
     return Application(
         handlers=[
             (r"/api/tasks/create", CreateTaskHandler),
-            (r"/api/tasks/list", ListTaskHandler)
+            (r"/api/tasks/list", ListTaskHandler),
+            (r"/api/results", ResultsHandler)
         ]
     )
 

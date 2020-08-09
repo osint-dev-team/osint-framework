@@ -2,7 +2,6 @@
 
 from multiprocessing import Process
 
-from src.core.handlers.saver import Saver
 from src.core.runner.manager import CaseManager
 from src.db.crud import TaskCrud
 from src.server.structures.task import TaskItem
@@ -26,28 +25,30 @@ class TaskSpawner:
                 *case.get("args", []),
                 **case.get("kwargs", {})
             )
-            filename = Saver.save_results(result, name=str(task.task_id))
         except Exception as unexp_err:
-            task.set_error(msg=str(unexp_err))
+            pass
         else:
-            task.set_success(msg=f"Successfully saved, filename: {filename}")
-        finally:
-            TaskCrud.update_task(task)
+            TaskCrud.create_task_result(task, result)
 
     @staticmethod
-    def run_task(task: TaskItem, body: dict) -> None:
+    def run_task(task: TaskItem, cases: dict) -> None:
         """
         Spawn task process
         :param task: task object
-        :param body: request body
+        :param cases: request body
         :return: None
         """
-        process = Process(
-            target=TaskSpawner.process_task,
-            kwargs={
-                "task": task,
-                "case": body
-            },
-            daemon=True
-        )
-        process.start()
+        for case in cases:
+            process = Process(
+                target=TaskSpawner.process_task,
+                kwargs={
+                    "task": task,
+                    "case": case
+                },
+                daemon=True
+            )
+            process.start()
+        task.set_success(msg="Process spawning done")
+
+        # How to detect if task is done?
+        TaskCrud.update_task(task)
