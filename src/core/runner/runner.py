@@ -4,16 +4,17 @@
 Defines basic scripts runner
 """
 
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from importlib.machinery import SourceFileLoader
-from logging import basicConfig, INFO
 from pathlib import Path
 from types import ModuleType
 
-from src.core.utils.response import ScriptResponse
+import urllib3
 
-basicConfig(level=INFO)
+from src.core.utils.response import ScriptResponse
+from src.core.values.defaults import CoreDefaults
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class Defaults:
@@ -76,7 +77,12 @@ class ScriptRunner:
 
         # fmt: off
         try:
-            class_instance = getattr(module, script_class)(logger=path.parent.stem)
+            module_class = getattr(module, script_class)
+            applicable = set(module_class.required).intersection(kwargs.keys())
+            # If the current script is not applicable for the current set of arguments - skip it
+            if not applicable:
+                return
+            class_instance = module_class(logger=path.parent.stem)
             result.update(getattr(class_instance, function)(*args, **kwargs))
         except Exception as unexp_err:
             result.update(ScriptResponse.error(message=f"Unexpected execution error: {str(unexp_err)}"))
@@ -101,26 +107,37 @@ class ScriptRunner:
                 self.scripts[directory.stem].append(file)
         return self.scripts
 
-    def run_category(self, category: str, *args, **kwargs) -> None:
+    def run_category(
+        self,
+        category: str,
+        max_workers: int = CoreDefaults.MAX_THREADS,
+        timeout: int = CoreDefaults.CASE_TIMEOUT,
+        *args,
+        **kwargs
+    ) -> None:
         """
         Run a category with scripts
+        :param category: category to run
+        :param max_workers: max quantity of workers
+        :param timeout: timeout to wait in seconds
         :return: nothing
         """
         if not self.scripts:
             self.get_scripts()
-        futures = []
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            for script in self.scripts.get(category, []):
-                futures.append(
-                    executor.submit(
-                        fn=partial(
-                            self.exec_script, path=script, args=args, kwargs=kwargs
-                        )
-                    )
-                )
-        for future in futures:
-            result = future.result()
-            self.results.update({result.get("script"): result})
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [
+                executor.submit(self.exec_script, path=script, args=args, kwargs=kwargs)
+                for script in self.scripts.get(category, [])
+            ]
+        try:
+            for future in as_completed(futures, timeout=timeout):
+                result = future.result()
+                if not result:
+                    continue
+                self.results.update({result.get("script"): result})
+        except TimeoutError:
+            # Tasks took too much time - kill the execution process and return empty results
+            self.results = {}
 
     def get_results(self) -> dict:
         """

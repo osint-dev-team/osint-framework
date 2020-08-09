@@ -64,6 +64,11 @@ async def check_nickname_async(nickname: str, social) -> list:
 
 
 class Runner(OsintRunner):
+    """
+    Class that performs nickname check
+    """
+    required = ["username"]
+
     def __init__(self, logger: str = __name__):
         super().__init__(logger=logger)
 

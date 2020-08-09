@@ -12,6 +12,11 @@ from src.core.utils.validators import validate_kwargs
 
 
 class Runner(ReconRunner):
+    """
+    Class that generates Shodan favicon mmh3 hash
+    """
+    required = ["url"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 

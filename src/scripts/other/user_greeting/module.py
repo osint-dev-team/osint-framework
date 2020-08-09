@@ -6,6 +6,11 @@ from src.core.utils.validators import validate_kwargs
 
 
 class Runner(OsintRunner):
+    """
+    Class that greets users
+    """
+    required = ["username"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 
