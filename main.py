@@ -4,14 +4,12 @@
 Main runner.
 """
 
-from datetime import datetime
-from json import dump
 from logging import basicConfig, INFO
-from pathlib import Path
 from sys import argv
 
 from yaml import safe_load
 
+from src.core.handlers.saver import Saver
 from src.core.runner.manager import CaseManager
 from src.core.utils.log import Logger
 
@@ -20,7 +18,6 @@ logger = Logger.get_logger(name="osint-framework")
 
 
 class DefaultValues:
-    RESULTS_DIR = Path("results")
     CASES = []
 
 
@@ -53,22 +50,6 @@ def load_scenario(scenario: str or None = None) -> list:
         logger.error(msg=f"Scenario file is not available or can not be opened")
 
 
-def save_results(results: dict or list, name: str or None = "scenario") -> None:
-    """
-    Save scenario results
-    :param results: results to save
-    :param name: name to overwrite (if required)
-    :return: None
-    """
-    DefaultValues.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    current_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-    with open(
-        file=str(DefaultValues.RESULTS_DIR.joinpath(f"{name}_{current_time}.json")),
-        mode="w",
-    ) as results_file:
-        dump(results, results_file, indent=2, default=str, ensure_ascii=False)
-
-
 if __name__ == "__main__":
     # fmt: off
 
@@ -90,6 +71,6 @@ if __name__ == "__main__":
     multiple_results = list(manager.multi_case_runner())
 
     # Save it
-    save_results(multiple_results, name=scenario_file.replace(".yaml", ""))
+    Saver.save_results(multiple_results, name=scenario_file.replace(".yaml", ""))
 
     # fmt: on
