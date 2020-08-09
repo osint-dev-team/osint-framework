@@ -5,7 +5,7 @@ from pathlib import Path
 
 import aiohttp
 import requests
-
+import string
 from src.core.base.osint import OsintRunner
 from src.core.utils.response import ScriptResponse
 
@@ -55,7 +55,7 @@ async def check_nickname_async(nickname: str, social) -> list:
         while not social.empty():
             url = await social.get()
             try:
-                async with session.get(url) as response:
+                async with session.get(url, timeout=5) as response:
                     if response.status == 200:
                         ans.append(url)
             except:
@@ -76,6 +76,11 @@ class Runner(OsintRunner):
     async def __run(*args, **kwargs):
         try:
             username = kwargs.get("username")
+            bad_symbols = list(set(username).intersection(string.punctuation))
+            if bad_symbols:
+                return ScriptResponse.error(
+                    message=f"Invalid characters: {', '.join(bad_symbols)}"
+                )
             social = asyncio.Queue()
             for site in Networks().net:
                 await social.put(
