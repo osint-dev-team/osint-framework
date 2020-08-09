@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-from unittest import TestCase
-from .module import Runner
-from random import choice, randrange
 import string
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from threading import Thread
+from random import choice, randrange
+from unittest import TestCase
+
+from .module import Runner
 
 
 class NicknameCheckTest(TestCase):
@@ -26,8 +25,8 @@ class NicknameCheckTest(TestCase):
 
     def test_nicknames(self) -> None:
         """
-        Tests  different usernames with random acceptable
-         characters
+        Test different usernames with random acceptable
+        characters
         :return: None
         """
         response = self.runner.run(username="")
@@ -39,13 +38,13 @@ class NicknameCheckTest(TestCase):
 
     def test_special_nicknames(self) -> None:
         """
-        Tests  not acceptable characters in username
-         and not acceptable formats of the stdin
+        Test not acceptable characters in username
+        and not acceptable formats of the stdin
         :return:
         """
         response = self.runner.run(username=None)
         self.assertEqual(response.get("status"), "error")
         for _ in range(5):
-            nickname = ''.join(choice(string.punctuation) for _ in range(randrange(3,5)))
+            nickname = "".join(choice(string.punctuation) for _ in range(randrange(3, 5)))
             response = self.runner.run(username=nickname)
             self.assertEqual(response.get("status"), "error")
