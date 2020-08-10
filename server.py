@@ -86,7 +86,7 @@ class CreateTaskHandler(BaseHandler, ABC):
             body = json_decode(self.request.body)
             task = TaskItem()
             TaskCrud.create_task(task=task)
-            TaskSpawner().run_task(task, body)
+            TaskSpawner.run_task(task, body)
             response = json_encode(task.as_json())
         except Exception as create_task_err:
             return self.error(
