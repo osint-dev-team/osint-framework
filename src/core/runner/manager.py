@@ -43,7 +43,7 @@ class CaseManager:
         case_description: str or None = None,
         *args,
         **kwargs,
-    ):
+    ) -> dict:
         """
         Define and smoke run the BaseCase
         :param case_class: original class of the case, name of it
