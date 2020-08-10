@@ -5,6 +5,7 @@ class DefaultValues:
     """
     Define some default values
     """
+
     EMPTY = ""
 
 
@@ -12,6 +13,7 @@ class ResponseStatus:
     """
     Define basic structure for the response
     """
+
     ERROR = "error"
     SUCCESS = "success"
 
@@ -20,6 +22,7 @@ class ServerResponse:
     """
     Define basic status responses from server
     """
+
     def __init__(self):
         ...
 

@@ -33,7 +33,13 @@ class BaseHandler(RequestHandler, ABC):
     Add basic handler to support 'success', 'error'
     messages and more
     """
-    def __init__(self, application: "Application", request: httputil.HTTPServerRequest, **kwargs: Any):
+
+    def __init__(
+        self,
+        application: "Application",
+        request: httputil.HTTPServerRequest,
+        **kwargs: Any,
+    ):
         super().__init__(application, request, **kwargs)
         self.server_response = ServerResponse()
 
@@ -70,6 +76,7 @@ class CreateTaskHandler(BaseHandler, ABC):
     """
     Create basic task handler
     """
+
     def post(self):
         """
         Handle task create process
@@ -82,7 +89,9 @@ class CreateTaskHandler(BaseHandler, ABC):
             TaskSpawner().run_task(task, body)
             response = json_encode(task.as_json())
         except Exception as create_task_err:
-            return self.error(msg=f"Unexpected error at task creating: {str(create_task_err)}")
+            return self.error(
+                msg=f"Unexpected error at task creating: {str(create_task_err)}"
+            )
         return self.write(response)
 
 
@@ -90,6 +99,7 @@ class ListTaskHandler(BaseHandler, ABC):
     """
     Return tasks
     """
+
     def get(self) -> None:
         """
         Return tasks data
@@ -97,9 +107,13 @@ class ListTaskHandler(BaseHandler, ABC):
         """
         try:
             task_id = self.get_argument("task_id", None)
-            tasks = json_encode(TaskCrud.get_task(task_id) if task_id else TaskCrud.get_tasks())
+            tasks = json_encode(
+                TaskCrud.get_task(task_id) if task_id else TaskCrud.get_tasks()
+            )
         except Exception as list_task_err:
-            return self.error(msg=f"Unexpected error at tasks listing: {str(list_task_err)}")
+            return self.error(
+                msg=f"Unexpected error at tasks listing: {str(list_task_err)}"
+            )
         return self.write(tasks)
 
 
@@ -107,6 +121,7 @@ class ResultsHandler(BaseHandler, ABC):
     """
     Return results
     """
+
     def get(self) -> None:
         """
         Return results data
@@ -116,7 +131,9 @@ class ResultsHandler(BaseHandler, ABC):
             task_id = self.get_argument("task_id", None)
             results = json_encode(TaskCrud.get_results(task_id))
         except Exception as get_results_error:
-            return self.error(msg=f"Unexpected error at getting results: {str(get_results_error)}")
+            return self.error(
+                msg=f"Unexpected error at getting results: {str(get_results_error)}"
+            )
         return self.write(results)
 
 
@@ -129,7 +146,7 @@ def make_app() -> Application:
         handlers=[
             (r"/api/tasks/create", CreateTaskHandler),
             (r"/api/tasks/list", ListTaskHandler),
-            (r"/api/results", ResultsHandler)
+            (r"/api/results", ResultsHandler),
         ]
     )
 

@@ -19,10 +19,12 @@ class DefaultValues:
 
 
 # Define engine, FIXME: required to get user+pass from environment
-Engine = create_engine(f"postgres+psycopg2://"
-                       f"{DefaultValues.PG_USER}:{DefaultValues.PG_PASSWORD}@"
-                       f"{DefaultValues.PG_HOST}:{str(DefaultValues.PG_PORT)}/"
-                       f"{DefaultValues.PG_DATABASE}")
+Engine = create_engine(
+    f"postgres+psycopg2://"
+    f"{DefaultValues.PG_USER}:{DefaultValues.PG_PASSWORD}@"
+    f"{DefaultValues.PG_HOST}:{str(DefaultValues.PG_PORT)}/"
+    f"{DefaultValues.PG_DATABASE}"
+)
 if not database_exists(Engine.url):
     create_database(Engine.url)
 

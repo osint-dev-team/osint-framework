@@ -10,6 +10,7 @@ class Task(Base):
     """
     Defines basic task structure
     """
+
     __tablename__ = "tasks"
 
     task_id = Column(String, unique=True, index=True, primary_key=True)
@@ -25,6 +26,7 @@ class Result(Base):
     """
     Defines results
     """
+
     __tablename__ = "results"
 
     result = Column(String)

@@ -23,7 +23,7 @@ class TaskSpawner:
             case_name=case.get("name"),
             case_description=case.get("description"),
             *case.get("args", []),
-            **case.get("kwargs", {})
+            **case.get("kwargs", {}),
         )
         # Save results to database
         TaskCrud.create_task_result(task, result or {})
@@ -51,10 +51,6 @@ class TaskSpawner:
         for case in cases:
             Process(
                 target=TaskSpawner.process_task,
-                kwargs={
-                    "task": task,
-                    "case": case,
-                    "cases_len": cases_len
-                },
-                daemon=True
+                kwargs={"task": task, "case": case, "cases_len": cases_len},
+                daemon=True,
             ).start()

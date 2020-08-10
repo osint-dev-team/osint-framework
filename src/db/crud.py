@@ -20,8 +20,7 @@ def object_as_dict(obj):
     """
     if not obj:
         return obj
-    return {c.key: getattr(obj, c.key)
-            for c in inspect(obj).mapper.column_attrs}
+    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
 class TaskCrud:
@@ -47,7 +46,9 @@ class TaskCrud:
             db.close()
 
     @staticmethod
-    def create_task_result(task: TaskItem, result: dict or list, db: Session = SessionLocal()) -> None:
+    def create_task_result(
+        task: TaskItem, result: dict or list, db: Session = SessionLocal()
+    ) -> None:
         """
         Create result for task
         :param task:
@@ -56,7 +57,9 @@ class TaskCrud:
         :return:
         """
         try:
-            db_result = models.Result(result=dumps(result, default=str), owner_id=task.task_id)
+            db_result = models.Result(
+                result=dumps(result, default=str), owner_id=task.task_id
+            )
             db.add(db_result)
             db.commit()
         except:
@@ -88,7 +91,9 @@ class TaskCrud:
         :return: dict
         """
         try:
-            results = db.query(models.Result).filter(models.Result.owner_id == task_id).all()
+            results = (
+                db.query(models.Result).filter(models.Result.owner_id == task_id).all()
+            )
         except:
             return []
         else:
@@ -105,7 +110,11 @@ class TaskCrud:
         :return: counter
         """
         try:
-            return db.query(models.Result).filter(models.Result.owner_id == task_id).count()
+            return (
+                db.query(models.Result)
+                .filter(models.Result.owner_id == task_id)
+                .count()
+            )
         except:
             return 0
         finally:

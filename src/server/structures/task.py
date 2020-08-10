@@ -8,6 +8,7 @@ class DefaultValues:
     """
     Define some default values
     """
+
     EMPTY = ""
 
 
@@ -15,6 +16,7 @@ class TaskStatus:
     """
     Define basic statuses for the task
     """
+
     PENDING = "pending"
     SUCCESS = "success"
     ERROR = "error"
@@ -24,13 +26,14 @@ class TaskItem:
     """
     Implement basic task structure
     """
+
     def __init__(
         self,
         status: str = TaskStatus.PENDING,
         message: str = DefaultValues.EMPTY,
         task_id: uuid4 = uuid4,
         datetime_start: datetime = None,
-        datetime_finish: datetime or None = None
+        datetime_finish: datetime or None = None,
     ):
         """
         Define basic structure
@@ -56,13 +59,15 @@ class TaskItem:
         Implement printable representation
         :return: string with representation
         """
-        return f"Task item, instance of the class '{self.__class__.__name__}'. " \
-               f"Values: " \
-               f"'status'='{self.status}', " \
-               f"'message'='{self.message}', " \
-               f"'task_id'='{self.task_id}', " \
-               f"'datetime_start'='{self.datetime_start}', " \
-               f"'datetime_finish'='{self.datetime_finish}'"
+        return (
+            f"Task item, instance of the class '{self.__class__.__name__}'. "
+            f"Values: "
+            f"'status'='{self.status}', "
+            f"'message'='{self.message}', "
+            f"'task_id'='{self.task_id}', "
+            f"'datetime_start'='{self.datetime_start}', "
+            f"'datetime_finish'='{self.datetime_finish}'"
+        )
 
     def __iter__(self) -> iter:
         """
@@ -105,4 +110,6 @@ class TaskItem:
         Implement str cast representation to dump data
         :return: dict with str-repr data
         """
-        return {key: str(value) if value else value for (key, value) in vars(self).items()}
+        return {
+            key: str(value) if value else value for (key, value) in vars(self).items()
+        }
