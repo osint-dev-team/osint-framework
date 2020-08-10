@@ -9,12 +9,12 @@ from src.server.structures.task import TaskItem
 
 class TaskSpawner:
     @staticmethod
-    def process_task(task: TaskItem, case: dict, quantity: int) -> None:
+    def process_task(task: TaskItem, case: dict, cases_len: int) -> None:
         """
         Process single task in daemon process
         :param task: task object
         :param case: required data for searching
-        :param quantity: quantity of tasks
+        :param cases_len: quantity of tasks
         :return: None
         """
         case_manager = CaseManager()
@@ -25,12 +25,18 @@ class TaskSpawner:
             *case.get("args", []),
             **case.get("kwargs", {})
         )
-        TaskCrud.create_task_result(task, result)
+        # Save results to database
+        TaskCrud.create_task_result(task, result or {})
+
+        # Count quantity of done cases for particular id
         done_tasks = TaskCrud.get_results_count(task_id=task.task_id)
-        if done_tasks == quantity:
-            task.set_success(msg=f"All cases done")
+
+        if done_tasks == cases_len:
+            task.set_success(msg=f"All cases done ({done_tasks} out of {cases_len})")
         else:
-            task.set_pending(msg=f"Done {done_tasks} of {quantity} cases")
+            task.set_pending(msg=f"Done {done_tasks} out of {cases_len} cases")
+
+        # Update task in any case
         TaskCrud.update_task(task)
 
     @staticmethod
@@ -41,19 +47,14 @@ class TaskSpawner:
         :param cases: request body
         :return: None
         """
-        quantity = len(cases)
+        cases_len = len(cases)
         for case in cases:
-            process = Process(
+            Process(
                 target=TaskSpawner.process_task,
                 kwargs={
                     "task": task,
                     "case": case,
-                    "quantity": quantity
+                    "cases_len": cases_len
                 },
                 daemon=True
-            )
-            process.start()
-        task.set_success(msg="Process spawning done")
-
-        # How to detect if task is done?
-        TaskCrud.update_task(task)
+            ).start()
