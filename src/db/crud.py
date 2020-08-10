@@ -89,27 +89,27 @@ class TaskCrud:
         """
         try:
             results = db.query(models.Result).filter(models.Result.owner_id == task_id).all()
-            db.close()
         except:
             return []
         else:
             return [loads(str(data.result)) for data in results]
+        finally:
+            db.close()
 
     @staticmethod
-    def get_results_count(task_id: str, db: Session = SessionLocal()) -> list:
+    def get_results_count(task_id: str, db: Session = SessionLocal()) -> int:
         """
         Return resutls count
         :param task_id: task id to use
         :param db: database to use
-        :return: count
+        :return: counter
         """
-        count = None
         try:
-            count = db.query(models.Result).filter(models.Result.owner_id == task_id).count()
+            return db.query(models.Result).filter(models.Result.owner_id == task_id).count()
         except:
-            pass
-        db.close()
-        return count
+            return 0
+        finally:
+            db.close()
 
     @staticmethod
     def get_task(task_id: str, db: Session = SessionLocal()) -> dict:
@@ -121,11 +121,12 @@ class TaskCrud:
         """
         try:
             result = db.query(models.Task).filter_by(task_id=task_id).first()
-            db.close()
         except:
             return {}
         else:
             return object_as_dict(result)
+        finally:
+            db.close()
 
     @staticmethod
     def get_tasks(db: Session = SessionLocal()) -> list:
@@ -136,8 +137,9 @@ class TaskCrud:
         """
         try:
             results = db.query(models.Task).all()
-            db.close()
         except:
             return []
         else:
             return [object_as_dict(result) for result in results]
+        finally:
+            db.close()
