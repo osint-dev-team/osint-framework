@@ -59,7 +59,7 @@ class BaseHandler(RequestHandler, ABC):
         """
         self.set_status(status_code=200)
         response = self.server_response.success(msg=msg)
-        return self.write(response)
+        self.write(response)
 
     def error(self, msg: str = "") -> None:
         """
@@ -69,7 +69,7 @@ class BaseHandler(RequestHandler, ABC):
         """
         self.set_status(status_code=500)
         response = self.server_response.error(msg=msg)
-        return self.write(response)
+        self.write(response)
 
 
 class CreateTaskHandler(BaseHandler, ABC):
@@ -92,7 +92,7 @@ class CreateTaskHandler(BaseHandler, ABC):
             return self.error(
                 msg=f"Unexpected error at task creating: {str(create_task_err)}"
             )
-        return self.write(response)
+        self.write(response)
 
 
 class ListTaskHandler(BaseHandler, ABC):
@@ -114,7 +114,7 @@ class ListTaskHandler(BaseHandler, ABC):
             return self.error(
                 msg=f"Unexpected error at tasks listing: {str(list_task_err)}"
             )
-        return self.write(tasks)
+        self.write(tasks)
 
 
 class ResultsHandler(BaseHandler, ABC):
@@ -134,7 +134,7 @@ class ResultsHandler(BaseHandler, ABC):
             return self.error(
                 msg=f"Unexpected error at getting results: {str(get_results_error)}"
             )
-        return self.write(results)
+        self.write(results)
 
 
 def make_app() -> Application:

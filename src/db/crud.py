@@ -3,8 +3,6 @@
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 from json import dumps, loads
-from time import sleep
-from random import randint
 
 from src.db import models
 from src.db.database import SessionLocal
