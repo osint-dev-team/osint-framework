@@ -22,20 +22,6 @@ class DefaultValues:
     CASES = []
 
 
-def run_single_case(manager: CaseManager) -> dict or list:
-    """
-    Run single case
-    :param manager: manager to use
-    :return: data
-    """
-    return manager.single_case_runner(
-        case_class="recon",
-        case_name="test single runner",
-        case_description="Nothing special",
-        url="https://habr.com/",
-    )
-
-
 def load_scenario(scenario: str or None = None) -> list:
     """
     Load scenario to run
