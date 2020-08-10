@@ -12,7 +12,7 @@ from yaml import safe_load
 from src.core.handlers.saver import Saver
 from src.core.runner.manager import CaseManager
 from src.core.utils.log import Logger
-from json import dumps
+
 
 basicConfig(level=INFO)
 logger = Logger.get_logger(name="osint-framework")
