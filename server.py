@@ -107,8 +107,11 @@ class ListTaskHandler(BaseHandler, ABC):
         """
         try:
             task_id = self.get_argument("task_id", None)
+            limit = self.get_argument("limit", None)
             tasks = json_encode(
-                TaskCrud.get_task(task_id) if task_id else TaskCrud.get_tasks()
+                TaskCrud.get_task(task_id)
+                if task_id
+                else TaskCrud.get_tasks(int(limit) if limit else None)
             )
         except Exception as list_task_err:
             return self.error(

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import inspect
+from sqlalchemy import inspect, desc
 from sqlalchemy.orm import Session
 from json import dumps, loads
 
@@ -35,7 +35,7 @@ class TaskCrud:
         :return: None
         """
         try:
-            db_task = models.Task(**task.as_json())
+            db_task = models.Task(**dict(task))
             db.add(db_task)
             db.commit()
         except:
@@ -73,7 +73,7 @@ class TaskCrud:
         :return: None
         """
         try:
-            db.query(models.Task).filter_by(task_id=task.task_id).update(task.as_json())
+            db.query(models.Task).filter_by(task_id=task.task_id).update(dict(task))
             db.commit()
         except:
             db.rollback()
@@ -136,14 +136,15 @@ class TaskCrud:
             db.close()
 
     @staticmethod
-    def get_tasks(db: Session = SessionLocal()) -> list:
+    def get_tasks(limit: int, db: Session = SessionLocal()) -> list:
         """
         Return all tasks
+        :param limit: limit of results
         :param db: database to use
         :return: list of results
         """
         try:
-            results = db.query(models.Task).all()
+            results = db.query(models.Task).order_by(desc(models.Task.datetime_start)).limit(limit).all()
         except:
             return []
         else:

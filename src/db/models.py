@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import Column, String, ForeignKey, Integer
+from sqlalchemy import Column, String, ForeignKey, Integer, DateTime
 from sqlalchemy.orm import relationship
 
 from src.db.database import Base
@@ -16,8 +16,8 @@ class Task(Base):
     task_id = Column(String, unique=True, index=True, primary_key=True)
     status = Column(String)
     message = Column(String)
-    datetime_start = Column(String)
-    datetime_finish = Column(String)
+    datetime_start = Column(DateTime)
+    datetime_finish = Column(DateTime)
 
     results = relationship("Result", back_populates="owner")
 
