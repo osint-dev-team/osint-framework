@@ -2,7 +2,6 @@
 .idea/
 .DS_Store
 results/*
-tasks.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
