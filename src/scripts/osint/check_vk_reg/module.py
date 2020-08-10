@@ -146,8 +146,7 @@ class Runner(OsintRunner):
         system: str = platform.system().lower()
 
         path: str = str(
-            Path(__file__).parents[4]
-            / "src"
+            Path(__file__).parent.parent.parent.parent
             / "drivers"
             / ("chromedriver_" + system + ".exe" if system == "windows" else "")
         )
