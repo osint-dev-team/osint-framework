@@ -146,6 +146,7 @@ class TaskCrud:
         try:
             results = db.query(models.Task).order_by(desc(models.Task.datetime_start)).limit(limit).all()
         except:
+            # FIXME: This exception can be possible IMMEDIATELY after task creation. Fixes?
             return []
         else:
             return [object_as_dict(result) for result in results]

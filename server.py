@@ -11,6 +11,7 @@ from typing import Any
 import tornado.log
 from tornado import httputil
 from tornado.escape import json_decode, json_encode
+from json import dumps
 from tornado.ioloop import IOLoop
 from tornado.options import parse_command_line
 from tornado.web import RequestHandler, Application
@@ -108,10 +109,11 @@ class ListTaskHandler(BaseHandler, ABC):
         try:
             task_id = self.get_argument("task_id", None)
             limit = self.get_argument("limit", None)
-            tasks = json_encode(
+            tasks = dumps(
                 TaskCrud.get_task(task_id)
                 if task_id
-                else TaskCrud.get_tasks(int(limit) if limit else None)
+                else TaskCrud.get_tasks(int(limit) if limit else None),
+                default=str
             )
         except Exception as list_task_err:
             return self.error(

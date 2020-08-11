@@ -4,6 +4,7 @@ from multiprocessing import Process
 
 from src.core.runner.manager import CaseManager
 from src.db.crud import TaskCrud
+from src.db.database import Engine
 from src.server.structures.task import TaskItem
 
 
@@ -17,6 +18,9 @@ class TaskSpawner:
         :param cases_len: quantity of tasks
         :return: None
         """
+        # see:
+        # https://stackoverflow.com/questions/30241911/psycopg2-error-databaseerror-error-with-no-message-from-the-libpq
+        Engine.dispose()
         case_manager = CaseManager()
         result = case_manager.single_case_runner(
             case_class=case.get("case"),

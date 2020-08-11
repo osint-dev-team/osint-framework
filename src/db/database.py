@@ -12,19 +12,18 @@ from os import environ
 
 
 class DefaultValues:
-    PG_DATABASE = environ.get("PG_DATABASE", default="osint")
-    PG_PASSWORD = environ.get("PG_PASSWORD", default="osint_framework")
-    PG_USER = environ.get("PG_USER", default="osint_framework")
-    PG_HOST = environ.get("PG_HOST", default="localhost")
-    PG_PORT = environ.get("PG_PORT", default=str(5432))
+    POSTGRES_DATABASE = environ.get("POSTGRES_DATABASE", default="osint")
+    POSTGRES_PASSWORD = environ.get("POSTGRES_PASSWORD", default="osint_framework")
+    POSTGRES_USER = environ.get("POSTGRES_USER", default="osint_framework")
+    POSTGRES_HOST = environ.get("POSTGRES_HOST", default="localhost")
+    POSTGRES_PORT = environ.get("POSTGRES_PORT", default=str(5432))
 
 
-# Define engine, FIXME: required to get user+pass from environment
 Engine = create_engine(
     f"postgres+psycopg2://"
-    f"{DefaultValues.PG_USER}:{DefaultValues.PG_PASSWORD}@"
-    f"{DefaultValues.PG_HOST}:{str(DefaultValues.PG_PORT)}/"
-    f"{DefaultValues.PG_DATABASE}"
+    f"{DefaultValues.POSTGRES_USER}:{DefaultValues.POSTGRES_PASSWORD}@"
+    f"{DefaultValues.POSTGRES_HOST}:{str(DefaultValues.POSTGRES_PORT)}/"
+    f"{DefaultValues.POSTGRES_DATABASE}"
 )
 if not database_exists(Engine.url):
     create_database(Engine.url)
