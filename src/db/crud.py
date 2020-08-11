@@ -144,7 +144,12 @@ class TaskCrud:
         :return: list of results
         """
         try:
-            results = db.query(models.Task).order_by(desc(models.Task.datetime_start)).limit(limit).all()
+            results = (
+                db.query(models.Task)
+                .order_by(desc(models.Task.datetime_start))
+                .limit(limit)
+                .all()
+            )
         except:
             # FIXME: This exception can be possible IMMEDIATELY after task creation. Fixes?
             return []

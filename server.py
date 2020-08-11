@@ -113,7 +113,7 @@ class ListTaskHandler(BaseHandler, ABC):
                 TaskCrud.get_task(task_id)
                 if task_id
                 else TaskCrud.get_tasks(int(limit) if limit else None),
-                default=str
+                default=str,
             )
         except Exception as list_task_err:
             return self.error(
