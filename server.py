@@ -12,6 +12,10 @@ from multiprocessing import Process
 from src.server.structures.task import TaskItem
 from src.core.runner.manager import CaseManager
 from main import save_results
+from json import dumps
+
+from src.db.database import Base, Engine
+from src.db.crud import TaskCrud
 
 
 class BaseHandler(RequestHandler, ABC):
@@ -43,7 +47,9 @@ class TaskSpawner:
             *case.get("args", []),
             **case.get("kwargs", {})
         )
-        save_results(results=result)
+        TaskCrud.create_result(task, result=result)
+        task.set_success(msg=f"Case {case.get('name')} successfully done")
+        TaskCrud.update_task(task)
 
     @staticmethod
     def run_task(task: TaskItem, case: dict) -> None:
@@ -56,13 +62,13 @@ class TaskSpawner:
             daemon=True
         )
         process.start()
-        task.set_success()
 
 
 class CreateTaskHandler(BaseHandler, ABC):
     def post(self):
         body = json_decode(self.request.body)
         task = TaskItem()
+        TaskCrud.create_task(task)
         TaskSpawner.run_task(task, case=body)
         response = json_encode(task.as_json())
         return self.write(response)
@@ -74,13 +80,23 @@ class CreateTaskHandler(BaseHandler, ABC):
 class ListTaskHandler(BaseHandler, ABC):
     def get(self):
         task_id = self.get_argument("task_id", None)
-        ...
-        return self.success(msg=f"Task id is: {task_id}")
+        limit = self.get_argument("limit", None)
+
+        tasks = dumps(
+            TaskCrud.get_task(task_id)
+            if task_id
+            else TaskCrud.get_tasks(int(limit) if limit else None), default=str
+        )
+
+        self.write(tasks)
 
 
 class ResultsHandler(BaseHandler, ABC):
     def get(self):
-        ...
+        task_id = self.get_argument("task_id", None)
+        results = json_encode(TaskCrud.get_results(task_id))
+
+        self.write(results)
 
 
 def make_app() -> Application:
@@ -94,6 +110,8 @@ def make_app() -> Application:
 
 
 if __name__ == "__main__":
+    Base.metadata.create_all(Engine)
+
     app = make_app()
     app.listen(port=8888)
 
