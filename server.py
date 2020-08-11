@@ -142,6 +142,19 @@ class ResultsHandler(BaseHandler, ABC):
         self.write(results)
 
 
+class HealthCheckHandler(BaseHandler, ABC):
+    """
+    Implement docker health check
+    """
+
+    def get(self) -> None:
+        """
+        Return service status
+        :return: None
+        """
+        self.write({"status": "up"})
+
+
 def make_app() -> Application:
     """
     Create application
@@ -152,6 +165,7 @@ def make_app() -> Application:
             (r"/api/tasks/create", CreateTaskHandler),
             (r"/api/tasks/list", ListTaskHandler),
             (r"/api/results", ResultsHandler),
+            (r"/api/health", HealthCheckHandler),
         ]
     )
 

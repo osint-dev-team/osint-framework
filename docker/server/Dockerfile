@@ -8,7 +8,7 @@ COPY . /app/
 COPY docker/server/wait-for-it.sh /app/wait-for-it.sh
 WORKDIR /app
 RUN apk add --no-cache --virtual .build_deps build-base libffi-dev gcc musl-dev && \
-    apk add --no-cache postgresql-dev bash && \
+    apk add --no-cache postgresql-dev bash curl && \
     pip install --no-cache-dir -r requirements.txt && \
     apk del .build_deps && \
     chmod +x wait-for-it.sh

@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.8"
 
 services:
   db:
@@ -9,6 +9,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-osint_framework}
       POSTGRES_USER: ${POSTGRES_USER:-osint_framework}
       PGDATA: /data/postgres
+    healthcheck:
+      test: pg_isready -U osint_framework
+      interval: 30s
+      timeout: 5s
+      retries: 5
     volumes:
       - postgres:/data/postgres
     networks:
@@ -30,6 +35,11 @@ services:
       context: .
       target: osint-framework-server
       dockerfile: docker/server/Dockerfile
+    healthcheck:
+      test: curl --fail -s http://localhost:8888/api/health || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 5
     ports:
       - "8888:8888"
     networks:
