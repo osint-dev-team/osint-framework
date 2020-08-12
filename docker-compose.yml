@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: osint-framework-db
+    image: postgres:alpine
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-osint_framework}
+      POSTGRES_USER: ${POSTGRES_USER:-osint_framework}
+      PGDATA: /data/postgres
+    healthcheck:
+      test: pg_isready -U osint_framework
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres:/data/postgres
+    networks:
+      - postgres
+    ports:
+      - "5432:5432"
+networks:
+  postgres:
+    driver: bridge
+volumes:
+  postgres:

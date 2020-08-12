@@ -38,7 +38,8 @@ class BaseHandler(RequestHandler, ABC):
 
 class TaskSpawner:
     @staticmethod
-    def process_task(task: TaskItem, case: dict) -> None:
+    def process_task(task: TaskItem, case: dict, cases_len: int) -> None:
+        Engine.dispose()
         manager = CaseManager()
         result = manager.single_case_runner(
             case_class=case.get("case"),
@@ -48,20 +49,30 @@ class TaskSpawner:
             **case.get("kwargs", {})
         )
         TaskCrud.create_result(task, result=result)
-        task.set_success(msg=f"Case {case.get('name')} successfully done")
+
+        done_cases = TaskCrud.get_results_count(task_id=task.task_id)
+
+        if done_cases == cases_len:
+            task.set_success(msg=f"All cases done ({done_cases} out of {cases_len})")
+        else:
+            task.set_pending(msg=f"Done {done_cases} out of {cases_len} cases")
+
         TaskCrud.update_task(task)
 
     @staticmethod
-    def run_task(task: TaskItem, case: dict) -> None:
-        process = Process(
-            target=TaskSpawner.process_task,
-            kwargs={
-                "task": task,
-                "case": case
-            },
-            daemon=True
-        )
-        process.start()
+    def run_task(task: TaskItem, cases: list) -> None:
+        cases_len = len(cases)
+        for case in cases:
+            process = Process(
+                target=TaskSpawner.process_task,
+                kwargs={
+                    "task": task,
+                    "case": case,
+                    "cases_len": cases_len,
+                },
+                daemon=True
+            )
+            process.start()
 
 
 class CreateTaskHandler(BaseHandler, ABC):
@@ -69,7 +80,7 @@ class CreateTaskHandler(BaseHandler, ABC):
         body = json_decode(self.request.body)
         task = TaskItem()
         TaskCrud.create_task(task)
-        TaskSpawner.run_task(task, case=body)
+        TaskSpawner.run_task(task, cases=body)
         response = json_encode(task.as_json())
         return self.write(response)
 
