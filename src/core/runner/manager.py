@@ -79,10 +79,12 @@ class CaseManager:
         :param max_workers: maximum processes
         :return: results
         """
-        logger.info(f"Start framework for {len(cases or self.cases)} cases")
-        with ProcessPoolExecutor(
-            max_workers=max_workers or self.max_workers
-        ) as executor:
+        if not cases:
+            cases = self.cases
+        if not max_workers:
+            max_workers = self.max_workers
+        logger.info(f"start framework for {len(cases)} cases (workers: {max_workers})")
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = {
                 executor.submit(
                     self.single_case_runner,
@@ -91,7 +93,7 @@ class CaseManager:
                     case_description=case.get("description"),
                     *case.get("args", []),
                     **case.get("kwargs", {}),
-                ): sleep(0.1) for case in cases or self.cases
+                ): sleep(0.1) for case in cases
             }
         for future in as_completed(futures):
             yield future.result()
