@@ -11,6 +11,7 @@ from src.core.case.osint import OsintCase
 from src.core.case.recon import ReconCase
 from src.core.utils.log import Logger
 from src.core.values.defaults import CoreDefaults
+from time import sleep
 
 logger = Logger.get_logger(name=__name__)
 
@@ -82,7 +83,7 @@ class CaseManager:
         with ProcessPoolExecutor(
             max_workers=max_workers or self.max_workers
         ) as executor:
-            futures = [
+            futures = {
                 executor.submit(
                     self.single_case_runner,
                     case_class=case.get("case"),
@@ -90,7 +91,7 @@ class CaseManager:
                     case_description=case.get("description"),
                     *case.get("args", []),
                     **case.get("kwargs", {}),
-                ) for case in cases or self.cases
-            ]
+                ): sleep(0.1) for case in cases or self.cases
+            }
         for future in as_completed(futures):
             yield future.result()

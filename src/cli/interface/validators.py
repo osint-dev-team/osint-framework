@@ -31,5 +31,5 @@ def check_arg_length() -> None:
     """
     if len(argv) == 1:
         console = Console()
-        console.print(f"usage: main.py [-h] [-s SCENARIO]", style="red")
+        console.print(f"usage: {argv[0]} [-h] [-s SCENARIO]", style="red")
         exit(1)

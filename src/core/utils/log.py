@@ -5,7 +5,8 @@ This module is used to log information from scripts (and maybe other modules).
 NOTE: As for now, this module is NOT used. Maybe in future we will add some additional formatting?
 """
 
-from logging import getLogger, Formatter, StreamHandler
+from logging import getLogger, Formatter
+from rich.logging import RichHandler
 
 
 class Logger:
@@ -26,7 +27,8 @@ class Logger:
         logger.propagate = False
 
         formatter = Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        handler = StreamHandler()
+
+        handler = RichHandler()
         handler.setFormatter(formatter)
 
         logger.addHandler(handler)
