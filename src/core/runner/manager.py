@@ -78,6 +78,7 @@ class CaseManager:
         :param max_workers: maximum processes
         :return: results
         """
+        logger.info(f"Start framework for {len(cases or self.cases)} cases")
         with ProcessPoolExecutor(
             max_workers=max_workers or self.max_workers
         ) as executor:

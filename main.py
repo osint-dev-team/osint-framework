@@ -5,59 +5,34 @@ Main runner.
 """
 
 from logging import basicConfig, INFO
-from sys import argv
 
-from yaml import safe_load
-
-from src.core.handlers.saver import Saver
+from src.cli.handlers.files import FileManager
+from src.cli.interface.arguments import parse_args
+from src.cli.interface.validators import check_arg_length, check_py_version
+from src.cli.interface.opener import show_opener
 from src.core.runner.manager import CaseManager
-from src.core.utils.log import Logger
+from pathlib import Path
 
 
 basicConfig(level=INFO)
-logger = Logger.get_logger(name="osint-framework")
-
-
-class DefaultValues:
-    CASES = []
-
-
-def load_scenario(scenario: str or None = None) -> list:
-    """
-    Load scenario to run
-    :param scenario: scenario .yaml filename
-    :return: list with data
-    """
-    if not scenario:
-        return DefaultValues.CASES
-    try:
-        with open(scenario, mode="r") as scenario_file:
-            return safe_load(scenario_file)
-    except:
-        logger.error(msg=f"Scenario file is not available or can not be opened")
 
 
 if __name__ == "__main__":
     # fmt: off
 
-    scenario_file = argv[1] if len(argv) >= 2 else None
+    show_opener()
+    check_py_version()
+    check_arg_length()
+    scenario = str(parse_args().scenario)
 
-    # Load scenario file
-    scenario_cases = load_scenario(scenario=scenario_file)
-    if not scenario_cases:
-        logger.error(msg=f"Scenario file is empty. Cases is not defined")
-        exit(1)
+    if scenario.endswith("json"):
+        cases = FileManager.load_json_scenario(scenario)
+    else:
+        cases = FileManager.load_yaml_scenario(scenario)
 
-    # Start processing
-    logger.info(f"Start framework for {len(scenario_cases)} cases")
+    manager = CaseManager(cases)
+    results = list(manager.multi_case_runner())
 
-    # Define CaseManager class
-    manager = CaseManager(cases=scenario_cases)
-
-    # Run all the cases in parallel way
-    multiple_results = list(manager.multi_case_runner())
-
-    # Save it
-    Saver.save_results(multiple_results, name=scenario_file.replace(".yaml", ""))
+    FileManager.save_results(results, name=Path(scenario).stem)
 
     # fmt: on
