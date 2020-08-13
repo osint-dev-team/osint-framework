@@ -11,7 +11,7 @@ services:
       PGDATA: /data/postgres
     healthcheck:
       test: pg_isready -U osint_framework
-      interval: 30s
+      interval: 5s
       timeout: 5s
       retries: 5
     volumes:
@@ -20,6 +20,30 @@ services:
       - postgres
     ports:
       - "5432:5432"
+  server:
+    container_name: osint-framework-server
+    image: osint-framework-server:1.0
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DATABASE: osint
+      POSTGRES_PASSWORD: osint_framework
+      POSTGRES_USER: osint_framework
+      POSTGRES_HOST: osint-framework-db
+      POSTGRES_PORT: 5432
+    healthcheck:
+      test: curl --fail --silent http://localhost:8888/api/health || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    build:
+      context: .
+      target: osint-framework-server
+      dockerfile: docker/server/Dockerfile
+    ports:
+      - "8888:8888"
+    networks:
+      - postgres
 networks:
   postgres:
     driver: bridge

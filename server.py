@@ -11,7 +11,6 @@ from multiprocessing import Process
 
 from src.server.structures.task import TaskItem
 from src.core.runner.manager import CaseManager
-from main import save_results
 from json import dumps
 
 from src.db.database import Base, Engine
@@ -110,12 +109,18 @@ class ResultsHandler(BaseHandler, ABC):
         self.write(results)
 
 
+class HealthCheckHandler(BaseHandler, ABC):
+    def get(self):
+        self.write({"status": "up"})
+
+
 def make_app() -> Application:
     return Application(
         handlers=[
             (r"/api/tasks/create", CreateTaskHandler),
             (r"/api/tasks/list", ListTaskHandler),
-            (r"/api/results", ResultsHandler)
+            (r"/api/results", ResultsHandler),
+            (r"/api/health", HealthCheckHandler),
         ]
     )
 

@@ -56,9 +56,16 @@ class TaskCrud:
 
     @staticmethod
     def get_tasks(limit: int, db: Session = SessionLocal()) -> list:
-        tasks = db.query(models.Task).order_by(desc(models.Task.datetime_start)).limit(limit).all()
-        db.close()
-        return [object_as_dict(task_result) for task_result in tasks]
+        ret_tasks = []
+        try:
+            tasks = db.query(models.Task).order_by(desc(models.Task.datetime_start)).limit(limit).all()
+        except:
+            pass
+        else:
+            ret_tasks = [object_as_dict(task_result) for task_result in tasks]
+        finally:
+            db.close()
+            return ret_tasks
 
 
 if __name__ == "__main__":
