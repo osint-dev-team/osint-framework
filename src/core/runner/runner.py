@@ -7,14 +7,18 @@ Defines basic scripts runner
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
+from time import sleep
 from types import ModuleType
 
 import urllib3
 
+from src.core.utils.log import Logger
 from src.core.utils.response import ScriptResponse
 from src.core.values.defaults import CoreDefaults
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+logger = Logger.get_logger(name=__name__)
 
 
 class Defaults:
@@ -65,7 +69,9 @@ class ScriptRunner:
         try:
             loader.exec_module(module)
         except Exception as unexp_err:
-            result.update(ScriptResponse.error(message=f"Unexpected module error: {str(unexp_err)}"))
+            message = f"Unexpected module error: {str(unexp_err)}"
+            logger.warning(message)
+            result.update(ScriptResponse.error(message=message))
             return result
         # fmt: on
 
@@ -125,10 +131,10 @@ class ScriptRunner:
         if not self.scripts:
             self.get_scripts()
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = [
-                executor.submit(self.exec_script, path=script, args=args, kwargs=kwargs)
+            futures = {
+                executor.submit(self.exec_script, path=script, args=args, kwargs=kwargs): sleep(0.1)
                 for script in self.scripts.get(category, [])
-            ]
+            }
         try:
             for future in as_completed(futures, timeout=timeout):
                 result = future.result()

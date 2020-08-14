@@ -11,6 +11,7 @@ from src.core.case.osint import OsintCase
 from src.core.case.recon import ReconCase
 from src.core.utils.log import Logger
 from src.core.values.defaults import CoreDefaults
+from time import sleep
 
 logger = Logger.get_logger(name=__name__)
 
@@ -43,7 +44,7 @@ class CaseManager:
         case_description: str or None = None,
         *args,
         **kwargs,
-    ):
+    ) -> dict:
         """
         Define and smoke run the BaseCase
         :param case_class: original class of the case, name of it
@@ -78,10 +79,13 @@ class CaseManager:
         :param max_workers: maximum processes
         :return: results
         """
-        with ProcessPoolExecutor(
-            max_workers=max_workers or self.max_workers
-        ) as executor:
-            futures = [
+        if not cases:
+            cases = self.cases
+        if not max_workers:
+            max_workers = self.max_workers
+        logger.info(f"start framework for {len(cases)} cases (workers: {max_workers})")
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = {
                 executor.submit(
                     self.single_case_runner,
                     case_class=case.get("case"),
@@ -89,7 +93,7 @@ class CaseManager:
                     case_description=case.get("description"),
                     *case.get("args", []),
                     **case.get("kwargs", {}),
-                ) for case in cases or self.cases
-            ]
+                ): sleep(0.1) for case in cases
+            }
         for future in as_completed(futures):
             yield future.result()
