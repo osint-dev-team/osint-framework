@@ -1,27 +1,55 @@
-# osint-framework
-:eyes: All-in-one OSINT/RECON Swiss Knife
+# OSINT Framework
+
+[![Required OS](https://img.shields.io/badge/OS-Linux%20based-blue)](https://en.wikipedia.org/wiki/Linux)
+[![Python3 Version](https://img.shields.io/badge/python-3.7%2B-blue)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-GPL--2.0-blue)](/LICENSE)
+[![Code Style](https://img.shields.io/badge/code%20style-black-000000)](https://github.com/psf/black)
+[![Last Commit](https://img.shields.io/github/last-commit/osint-dev-team/osint-framework)](https://github.com/osint-dev-team/osint-framework)
+
+<p align="center">
+    :fork_and_knife: All-in-one OSINT/RECON Swiss Knife
+</p>
+
+<p align="center">
+  <img src="/assets/screenshots/logo.png?raw=true" alt="OSINT Framework Logo" width="50%" height="50%" />
+</p> 
+
+## Screenshots
+
+<div align="center">
+  <img src="/assets/screenshots/cli.png?raw=true" alt="OSINT Framework CLI interface">
+  <p align="center"><i>CLI interface</i></p>
+</div> 
+
 
 ## Installing
 ```bash
-virtualenv -p python3 venv
-    (or python3 -m venv venv)
+virtualenv -p python3 venv (or python3 -m venv venv)
+source venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
-## Running as a framework
-_First of all: provide some arguments in the `main.py` file to collect information based on your data (WIP now, will be improved later)_  
-
-To run the framework:
+## Running
+### As a framework
+To run the framework with a command line interface:
 ```bash
-python3 main.py example_scenario.yaml
+python3 cli.py -h
 ```
-To run the tests:
-```bash
-chmod +x run_tests.sh
-./run_tests.sh
-```
+### As a REST API web service
 
-## Running as a separated module
+<div align="center">
+  <img src="/assets/screenshots/docker.png?raw=true" alt="OSINT Framework Docker usage">
+</div> 
+
+To run the framework as a web service via docker and docker-compose:  
+```bash
+make up
+```
+or
+```bash
+docker-compose up
+```
+## As a separated module
 Basic:
 ```python3
 python3 -m src.scripts.<category>.<name> any_arguments_here
