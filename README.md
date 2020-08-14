@@ -29,9 +29,14 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
+## Testing
+```bash
+make tests
+```
+
 ## Running
 ### As a framework
-To run the framework with a command line interface:
+To run the framework with a command-line interface:
 ```bash
 python3 cli.py -h
 ```
@@ -65,6 +70,111 @@ Example output:
  'result': 'Hello, JohnDoe!',
  'status': 'success'}
 
+```
+
+## REST API web service usage
+1. Create the task:
+```http
+POST /api/tasks/create HTTP/1.1
+Host: localhost:8888
+Content-Type: application/json
+
+[
+    {
+        "case": "base",
+        "name": "testname-profile",
+        "description": "Base example for 'testname' user profile",
+        "kwargs": {
+            "username": "testname",
+            "email": "testmail@gmail.com",
+            "fullname": "Test Name"
+        }
+    },
+    {
+        "case": "osint",
+        "name": "johndoe-profile",
+        "description": "Osint example for 'johndoe' user profile",
+        "kwargs": {
+            "username": "johndoe",
+            "email": "johndoe@gmail.com",
+            "fullname": "John Doe"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "facebook-website",
+        "description": "Recon example for 'facebook.com' website",
+        "kwargs": {
+            "url": "https://facebook.com"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "vk-website",
+        "description": "Recon example for 'vk.com' website",
+        "kwargs": {
+            "url": "https://vk.com"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "mail-website",
+        "description": "Recon example for 'mail.ru' website",
+        "kwargs": {
+            "url": "https://mail.ru"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "8-8-8-8-host",
+        "description": "Recon example for '8.8.8.8' host",
+        "kwargs": {
+            "ip": "8.8.8.8"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "92-63-64-162-host",
+        "description": "Recon example for '92.63.64.162' host",
+        "kwargs": {
+            "ip": "92.63.64.162"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "13-91-95-74-host",
+        "description": "Recon example for '13.91.95.74' host",
+        "kwargs": {
+            "ip": "13.91.95.74"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "87-240-190-78-host",
+        "description": "Recon example for '87.240.190.78' host",
+        "kwargs": {
+            "ip": "87.240.190.78"
+        }
+    },
+    {
+        "case": "osint",
+        "name": "phone-check",
+        "description": "check information about the phone number",
+        "kwargs": {
+            "phone": 89138111111
+        }
+    }
+]
+```
+2. Check tasks status:
+```http
+GET /api/tasks/list HTTP/1.1
+Host: localhost:8888
+```
+3. Get the results when the task is done:
+```http
+GET /api/results?task_id=<YOUR_TASK_ID> HTTP/1.1
+Host: localhost:8888
 ```
 
 ## Create your own script
