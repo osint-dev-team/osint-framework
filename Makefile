@@ -6,7 +6,7 @@ up:
 up_build:
 	docker-compose up -d --build --force-recreate
 
-test:
+tests:
 	python3 -W ignore:ResourceWarning -m unittest discover -v -b
 
 clean:
