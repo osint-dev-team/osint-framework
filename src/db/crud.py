@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import inspect, desc
+from sqlalchemy import inspect, desc, exc
 from sqlalchemy.orm import Session
 from json import dumps, loads
+from time import sleep
 
 from src.db import models
 from src.db.database import SessionLocal
@@ -21,12 +22,35 @@ def object_as_dict(obj):
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
+def retry(retries: int = 5) -> callable:
+    """
+    Retry query if error
+    :param retries: quantity of retries
+    :return: result
+    """
+
+    def wrap(function):
+        def wrapped_function(*args, **kwargs):
+            for attempt in range(retries):
+                try:
+                    return function(*args, **kwargs)
+                except exc.DBAPIError:
+                    sleep(0.5*attempt)
+                    continue
+            return function(*args, **kwargs)
+
+        return wrapped_function
+
+    return wrap
+
+
 class TaskCrud:
     """
     Defines namespace 'TaskCrud' to use different database handlers
     """
 
     @staticmethod
+    @retry()
     def create_task(task: TaskItem, db: Session = SessionLocal()) -> None:
         """
         Create task in database
@@ -38,12 +62,16 @@ class TaskCrud:
             db_task = models.Task(**dict(task))
             db.add(db_task)
             db.commit()
+        except exc.DBAPIError as api_err:
+            db.rollback()
+            raise api_err from api_err
         except:
             db.rollback()
         finally:
             db.close()
 
     @staticmethod
+    @retry()
     def create_task_result(
         task: TaskItem, result: dict or list, db: Session = SessionLocal()
     ) -> None:
@@ -60,11 +88,16 @@ class TaskCrud:
             )
             db.add(db_result)
             db.commit()
+        except exc.DBAPIError as api_err:
+            db.rollback()
+            raise api_err from api_err
         except:
             db.rollback()
-        db.close()
+        finally:
+            db.close()
 
     @staticmethod
+    @retry()
     def update_task(task: TaskItem, db: Session = SessionLocal()) -> None:
         """
         Update task in database
@@ -75,12 +108,16 @@ class TaskCrud:
         try:
             db.query(models.Task).filter_by(task_id=task.task_id).update(dict(task))
             db.commit()
+        except exc.DBAPIError as api_err:
+            db.rollback()
+            raise api_err from api_err
         except:
             db.rollback()
         finally:
             db.close()
 
     @staticmethod
+    @retry()
     def get_results(task_id: str, db: Session = SessionLocal()) -> list:
         """
         Return results
@@ -92,6 +129,8 @@ class TaskCrud:
             results = (
                 db.query(models.Result).filter(models.Result.owner_id == task_id).all()
             )
+        except exc.DBAPIError as api_err:
+            raise api_err from api_err
         except:
             return []
         else:
@@ -100,6 +139,7 @@ class TaskCrud:
             db.close()
 
     @staticmethod
+    @retry()
     def get_results_count(task_id: str, db: Session = SessionLocal()) -> int:
         """
         Return resutls count
@@ -113,12 +153,15 @@ class TaskCrud:
                 .filter(models.Result.owner_id == task_id)
                 .count()
             )
+        except exc.DBAPIError as api_err:
+            raise api_err from api_err
         except:
             return 0
         finally:
             db.close()
 
     @staticmethod
+    @retry()
     def get_task(task_id: str, db: Session = SessionLocal()) -> dict:
         """
         Return task results by UUID
@@ -128,6 +171,8 @@ class TaskCrud:
         """
         try:
             result = db.query(models.Task).filter_by(task_id=task_id).first()
+        except exc.DBAPIError as api_err:
+            raise api_err from api_err
         except:
             return {}
         else:
@@ -136,6 +181,7 @@ class TaskCrud:
             db.close()
 
     @staticmethod
+    @retry()
     def get_tasks(limit: int, db: Session = SessionLocal()) -> list:
         """
         Return all tasks
@@ -150,6 +196,8 @@ class TaskCrud:
                 .limit(limit)
                 .all()
             )
+        except exc.DBAPIError as api_err:
+            raise api_err from api_err
         except:
             # FIXME: This exception can be possible IMMEDIATELY after task creation. Fixes?
             return []
