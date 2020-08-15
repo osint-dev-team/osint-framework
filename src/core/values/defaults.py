@@ -8,7 +8,7 @@ from random import randrange
 
 
 class CoreDefaults:
-    MAX_PROCESSES = 10
+    MAX_PROCESSES = 5
     MAX_THREADS = 10
     CASE_TIMEOUT = 5 * 60
 
