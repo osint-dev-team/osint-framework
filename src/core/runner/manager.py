@@ -93,7 +93,7 @@ class CaseManager:
                     case_description=case.get("description"),
                     *case.get("args", []),
                     **case.get("kwargs", {}),
-                ): sleep(0.1) for case in cases
+                ): sleep(1.0) for case in cases
             }
         for future in as_completed(futures):
             yield future.result()
