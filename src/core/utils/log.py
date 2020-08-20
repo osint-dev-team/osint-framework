@@ -5,7 +5,9 @@ This module is used to log information from scripts (and maybe other modules).
 NOTE: As for now, this module is NOT used. Maybe in future we will add some additional formatting?
 """
 
-from logging import getLogger, Formatter
+from logging import getLogger, Formatter, StreamHandler
+from os import environ
+
 from rich.logging import RichHandler
 
 
@@ -28,7 +30,8 @@ class Logger:
 
         formatter = Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
-        handler = RichHandler()
+        # Choose the right handler: color Rich handler for CLI, StreamHandler for server part and Docker
+        handler = RichHandler() if environ.get("LOG_HANDLER", default="rich") == "rich" else StreamHandler()
         handler.setFormatter(formatter)
 
         logger.addHandler(handler)
