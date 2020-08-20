@@ -144,11 +144,10 @@ class Runner(OsintRunner):
         """
 
         system: str = platform.system().lower()
-
         path: str = str(
             Path(__file__).parent.parent.parent.parent
             / "drivers"
-            / ("chromedriver_" + system + ".exe" if system == "windows" else "")
+            / ("chromedriver_" + system + ".exe" if system == "windows" else "chromedriver_" + system)
         )
 
         self.__set_execution_rights(path)

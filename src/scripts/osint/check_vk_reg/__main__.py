@@ -6,5 +6,5 @@ from sys import argv
 from src.core.utils.module import run_module
 from .module import Runner
 
-result = run_module(Runner, args=argv, arg_name="phone", arg_default="88005553535")
+result = run_module(Runner, args=argv, arg_name="phone", arg_default="+79131111111")
 pprint(result)
