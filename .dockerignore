@@ -4,3 +4,5 @@
 !server.py
 !requirements.txt
 !docker/server/wait-for-it.sh
+!docker/consumer/wait-for-it.sh
+!docker/consumer/consumer.py
