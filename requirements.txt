@@ -12,7 +12,9 @@ cffi==1.14.0
 chardet==3.0.4
 colorama==0.4.3
 commonmark==0.9.1
+dnspython==2.0.0
 idna==2.10
+ipwhois==1.1.0
 mmh3==2.5.1
 multidict==4.7.6
 phonenumbers==8.12.7
