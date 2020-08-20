@@ -8,6 +8,11 @@ from src.core.utils.validators import validate_kwargs
 
 
 class Runner(OsintRunner):
+    """
+    Class that performs region check by phone number
+    """
+    required = ["phone"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 

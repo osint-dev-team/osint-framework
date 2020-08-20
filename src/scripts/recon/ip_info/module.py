@@ -10,6 +10,11 @@ from src.core.utils.validators import validate_kwargs
 
 
 class Runner(ReconRunner):
+    """
+    Class that performs IP information check
+    """
+    required = ["ip"]
+
     def __init__(self, logger: str = __name__) -> None:
         super(Runner, self).__init__(logger)
         self.__BASE_URL = "http://ip-api.com/json/{query}?fields=18411513"
@@ -29,7 +34,9 @@ class Runner(ReconRunner):
             response.pop("status", None)
             return ScriptResponse.success(result=response, message=msg)
         except TypeError as type_err:
-            return ScriptResponse.error(message=f"Error occurred while trying to get data: {str(type_err)}")
+            return ScriptResponse.error(message=f"Error occurred while trying to get data: error status")
+        except Exception as unexp_err:
+            return ScriptResponse.error(message=f"Error occurred while trying to get data: {str(unexp_err)}")
         # fmt: on
 
     def __get_ip_info(self, ip: str) -> dict or str:

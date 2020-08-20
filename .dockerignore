@@ -1,0 +1,6 @@
+*
+.*
+!src
+!server.py
+!requirements.txt
+!docker/server/wait-for-it.sh
