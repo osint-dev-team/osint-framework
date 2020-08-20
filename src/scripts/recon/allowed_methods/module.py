@@ -53,6 +53,11 @@ def get_random_method():
 
 
 class Runner(ReconRunner):
+    """
+    Class that performs allowed methods check
+    """
+    required = ["url"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 
@@ -69,6 +74,7 @@ class Runner(ReconRunner):
         allowed_methods = []
         filtered_methods = []
         forbidden_methods = []
+        server_error = []
         url = kwargs.get("url")
 
         # Copy original methods list to avoid class variable modifications
@@ -90,17 +96,20 @@ class Runner(ReconRunner):
                     forbidden_methods.append(method_result)
                 else:
                     filtered_methods.append(method_result)
-            except RequestException:
-                pass
+            except RequestException as req_err:
+                method_result = {"method": method, "status": req_err}
+                server_error.append(method_result)
 
         return ScriptResponse.success(
             result={
                 "allowed": allowed_methods,
                 "forbidden": forbidden_methods,
                 "filtered": filtered_methods,
+                "server_error": server_error,
             },
             message=f"URL: {url} - "
             f"allowed: {len(allowed_methods)}, "
             f"forbidden: {len(forbidden_methods)}, "
-            f"filtered: {len(filtered_methods)}",
+            f"filtered: {len(filtered_methods)}, "
+            f"server_error: {len(server_error)}",
         )

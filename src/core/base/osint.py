@@ -5,8 +5,8 @@ Defines base runner for the OSINT scripts
 """
 from typing import Any
 
-from src.core.utils.validators import validate_kwargs
 from src.core.base.base import BaseRunner
+from src.core.utils.validators import validate_kwargs
 
 
 class PossibleKeys:
@@ -14,10 +14,14 @@ class PossibleKeys:
     Defines default values for the function arguments (kwargs, named args)
     """
 
-    KEYS = ["email", "username", "fullname", "vk_api_key", "phone"]
+    # fmt: off
+    KEYS = ["email", "username", "fullname", "vk_api_key", "phone", "region"]
+    # fmt: on
 
 
 class OsintRunner(BaseRunner):
+    required = []
+
     def __init__(self, logger: str = __name__):
         super(OsintRunner, self).__init__(logger)
 

@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+  db:
+    container_name: osint-framework-db
+    image: postgres:alpine
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-osint_framework}
+      POSTGRES_USER: ${POSTGRES_USER:-osint_framework}
+      PGDATA: /data/postgres
+    healthcheck:
+      test: pg_isready -U osint_framework
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres:/data/postgres
+    networks:
+      - postgres
+  server:
+    container_name: osint-framework-server
+    image: osint-framework-server:1.0
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-osint}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-osint_framework}
+      POSTGRES_USER: ${POSTGRES_USER:-osint_framework}
+      POSTGRES_HOST: ${POSTGRES_HOST:-osint-framework-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+    build:
+      context: .
+      target: osint-framework-server
+      dockerfile: docker/server/Dockerfile
+    healthcheck:
+      test: curl --fail -s http://localhost:8888/api/health || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "8888:8888"
+    networks:
+      - postgres
+networks:
+  postgres:
+    driver: bridge
+volumes:
+    postgres:

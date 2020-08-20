@@ -14,10 +14,14 @@ class PossibleKeys:
     Defines default values for the function arguments (kwargs, named args)
     """
 
-    KEYS = ["host", "hostname", "ip", "url"]
+    # fmt: off
+    KEYS = ["host", "hostname", "ip", "url", "torrent_api_key"]
+    # fmt: on
 
 
 class ReconRunner(BaseRunner):
+    required = []
+
     def __init__(self, logger: str = __name__):
         super(ReconRunner, self).__init__(logger)
 

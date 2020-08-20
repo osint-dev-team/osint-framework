@@ -9,6 +9,7 @@ class Runner(BaseRunner):
     """
     Basic example
     """
+    required = []
 
     def __init__(self, logger: str = __name__):
         """

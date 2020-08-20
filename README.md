@@ -1,30 +1,60 @@
-# osint-framework
-:eyes: All-in-one OSINT/RECON Swiss Knife
+# OSINT Framework
+
+[![Required OS](https://img.shields.io/badge/OS-Linux%20based-blue)](https://en.wikipedia.org/wiki/Linux)
+[![Python3 Version](https://img.shields.io/badge/python-3.7%2B-blue)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-GPL--2.0-blue)](/LICENSE)
+[![Code Style](https://img.shields.io/badge/code%20style-black-000000)](https://github.com/psf/black)
+[![Last Commit](https://img.shields.io/github/last-commit/osint-dev-team/osint-framework)](https://github.com/osint-dev-team/osint-framework)
+
+<p align="center">
+    :fork_and_knife: All-in-one OSINT/RECON Swiss Knife
+</p>
+
+<p align="center">
+  <img src="/assets/screenshots/logo.png?raw=true" alt="OSINT Framework Logo" width="50%" height="50%" />
+</p> 
+
+## Screenshots
+
+<div align="center">
+  <img src="/assets/screenshots/cli.png?raw=true" alt="OSINT Framework CLI interface">
+  <p align="center"><i>CLI interface</i></p>
+</div> 
+
 
 ## Installing
 ```bash
-virtualenv -p python3 venv
-    (or python3 -m venv venv)
+virtualenv -p python3 venv (or python3 -m venv venv)
+source venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
-## Running as a framework
-_First of all: provide some arguments in the `main.py` file to collect information based on your data (WIP now, will be improved later)_  
+## Testing
+```bash
+make tests
+```
 
-To run the framework:
+## Running
+### As a framework
+To run the framework with a command-line interface:
 ```bash
-python3 main.py
+python3 cli.py -h
 ```
-To run the tests:
+### As a REST API web service
+
+<div align="center">
+  <img src="/assets/screenshots/docker.png?raw=true" alt="OSINT Framework Docker usage">
+</div> 
+
+To run the framework as a web service via docker and docker-compose:  
 ```bash
-chmod +x run_tests.sh
-./run_tests.sh
+make up
 ```
-_or you can run them like this, of course:_
+or
 ```bash
-python3 -m unittest discover -v
+docker-compose up
 ```
-## Running as a separated module
+## As a separated module
 Basic:
 ```python3
 python3 -m src.scripts.<category>.<name> any_arguments_here
@@ -42,6 +72,111 @@ Example output:
 
 ```
 
+## REST API web service usage
+1. Create the task:
+```http
+POST /api/tasks/create HTTP/1.1
+Host: localhost:8888
+Content-Type: application/json
+
+[
+    {
+        "case": "base",
+        "name": "testname-profile",
+        "description": "Base example for 'testname' user profile",
+        "kwargs": {
+            "username": "testname",
+            "email": "testmail@gmail.com",
+            "fullname": "Test Name"
+        }
+    },
+    {
+        "case": "osint",
+        "name": "johndoe-profile",
+        "description": "Osint example for 'johndoe' user profile",
+        "kwargs": {
+            "username": "johndoe",
+            "email": "johndoe@gmail.com",
+            "fullname": "John Doe"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "facebook-website",
+        "description": "Recon example for 'facebook.com' website",
+        "kwargs": {
+            "url": "https://facebook.com"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "vk-website",
+        "description": "Recon example for 'vk.com' website",
+        "kwargs": {
+            "url": "https://vk.com"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "mail-website",
+        "description": "Recon example for 'mail.ru' website",
+        "kwargs": {
+            "url": "https://mail.ru"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "8-8-8-8-host",
+        "description": "Recon example for '8.8.8.8' host",
+        "kwargs": {
+            "ip": "8.8.8.8"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "92-63-64-162-host",
+        "description": "Recon example for '92.63.64.162' host",
+        "kwargs": {
+            "ip": "92.63.64.162"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "13-91-95-74-host",
+        "description": "Recon example for '13.91.95.74' host",
+        "kwargs": {
+            "ip": "13.91.95.74"
+        }
+    },
+    {
+        "case": "recon",
+        "name": "87-240-190-78-host",
+        "description": "Recon example for '87.240.190.78' host",
+        "kwargs": {
+            "ip": "87.240.190.78"
+        }
+    },
+    {
+        "case": "osint",
+        "name": "phone-check",
+        "description": "check information about the phone number",
+        "kwargs": {
+            "phone": 89138111111
+        }
+    }
+]
+```
+2. Check tasks status:
+```http
+GET /api/tasks/list HTTP/1.1
+Host: localhost:8888
+```
+3. Get the results when the task is done:
+```http
+GET /api/results?task_id=<YOUR_TASK_ID> HTTP/1.1
+Host: localhost:8888
+```
+
 ## Create your own script
 Use the following structure:  
 1. Create your own module directory in the following way:
@@ -51,10 +186,11 @@ Use the following structure:
 2. Provide the following structure of your script directory:
 ```
 your_script_name
-├── __init__.py     - use this module to set the default parent directory (you can copy this file from any other script)
-├── __main__.py     - use this module to provide some basic interface to use your script as a module (the same as if __name__ == "__main__")
-├── module.py       - use this module to describe the basic logic of your module (you can import it in the __main__.py to provide interface)
-└── test_module.py  - use this module for unittest tests
+├── requirements.txt - provide required libraries
+├── __init__.py      - use this module to set the default parent directory (you can copy this file from any other script)
+├── __main__.py      - use this module to provide some basic interface to use your script as a module (the same as if __name__ == "__main__")
+├── module.py        - use this module to describe the basic logic of your module (you can import it in the __main__.py to provide interface)
+└── test_module.py   - use this module for unittest tests
 ```
 3. Create the `__init__.py` file. An example of the `__init__.py` boilerplate structure can be seen below:
 ```python3
@@ -103,6 +239,9 @@ class Runner(OsintRunner):
     """
     Basic script example
     """
+    
+    # Define required arguments here 
+    required = ["my_argument"]
 
     def __init__(self, logger: str = __name__):
         """
@@ -114,6 +253,7 @@ class Runner(OsintRunner):
         """
         super(Runner, self).__init__(logger)
 
+    # Validate input arguments (if you need some validation)
     @validate_kwargs(PossibleKeys.KEYS)
     def run(self, *args, **kwargs) -> ScriptResponse.success or ScriptResponse.error:
         """
@@ -126,6 +266,7 @@ class Runner(OsintRunner):
         :return: ScriptResponse message (error or success)
         """
         argument = kwargs.get("my_argument", "Arguments were not provided!")
+        ...
         return ScriptResponse.success(message=f"Script finished with argument {argument}")
 ```
 6. For `test_module.py` you can use any required tests (as you wish). A test case for your module is required to keep the project clean.
