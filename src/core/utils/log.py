@@ -31,7 +31,11 @@ class Logger:
         formatter = Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
         # Choose the right handler: color Rich handler for CLI, StreamHandler for server part and Docker
-        handler = RichHandler() if environ.get("LOG_HANDLER", default="rich") == "rich" else StreamHandler()
+        handler = (
+            RichHandler()
+            if environ.get("LOG_HANDLER", default="rich") == "rich"
+            else StreamHandler()
+        )
         handler.setFormatter(formatter)
 
         logger.addHandler(handler)

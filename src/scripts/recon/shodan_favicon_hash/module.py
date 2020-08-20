@@ -15,6 +15,7 @@ class Runner(ReconRunner):
     """
     Class that generates Shodan favicon mmh3 hash
     """
+
     required = ["url"]
 
     def __init__(self, logger: str = __name__):

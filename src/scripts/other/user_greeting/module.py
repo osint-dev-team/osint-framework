@@ -9,6 +9,7 @@ class Runner(OsintRunner):
     """
     Class that greets users
     """
+
     required = ["username"]
 
     def __init__(self, logger: str = __name__):

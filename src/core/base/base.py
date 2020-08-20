@@ -11,6 +11,7 @@ class BaseRunner:
     """
     Defines base runner class to create childs from
     """
+
     required = []
 
     def __init__(self, logger: str = __name__):

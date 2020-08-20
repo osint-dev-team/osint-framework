@@ -10,6 +10,7 @@ class Runner(OsintRunner):
     """
     Class that generates different phone numbers
     """
+
     required = ["phone", "region"]
 
     def __init__(self, logger: str = __name__):
@@ -33,9 +34,10 @@ class Runner(OsintRunner):
             num_list.append(joined)
         phone_w_brackets = "{prefix}({code}){rest}".format(
             prefix=number_groups[0],
-            code=number_groups[1][1:-1] if number_groups[1][0] == '(' and number_groups[1][-1] == ')' else
-            number_groups[1],
-            rest="".join(number_groups[2:])
+            code=number_groups[1][1:-1]
+            if number_groups[1][0] == "(" and number_groups[1][-1] == ")"
+            else number_groups[1],
+            rest="".join(number_groups[2:]),
         )
         num_list.append(phone_w_brackets)
         return num_list
@@ -53,15 +55,18 @@ class Runner(OsintRunner):
             region = kwargs.get("region")
             parsed_num = parse(phone, region)
         except NumberParseException:
-            return ScriptResponse.error(result=None, message="Not viable number or not international format")
+            return ScriptResponse.error(
+                result=None, message="Not viable number or not international format"
+            )
         except Exception:
             return ScriptResponse.error(result=None, message="Something went wrong!")
         try:
             result = [
-                phone for phone_format in [
+                phone
+                for phone_format in [
                     PhoneNumberFormat.NATIONAL,
                     PhoneNumberFormat.INTERNATIONAL,
-                    PhoneNumberFormat.E164
+                    PhoneNumberFormat.E164,
                 ]
                 for phone in self.__gen_all(format_number(parsed_num, phone_format))
             ]

@@ -11,6 +11,7 @@ class Runner(OsintRunner):
     """
     Class that performs Russian Extremists list check
     """
+
     required = ["fullname"]
 
     def __init__(self, logger: str = __name__):

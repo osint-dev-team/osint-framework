@@ -56,6 +56,7 @@ class Runner(ReconRunner):
     """
     Class that performs allowed methods check
     """
+
     required = ["url"]
 
     def __init__(self, logger: str = __name__):

@@ -11,6 +11,7 @@ class Runner(OsintRunner):
     """
     Class that performs email verification
     """
+
     required = ["email"]
 
     def __init__(self, logger: str = __name__):

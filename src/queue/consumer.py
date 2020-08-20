@@ -14,7 +14,9 @@ logger = Logger.get_logger(name=__name__)
 
 
 class Consumer:
-    def __init__(self, host: str = Default.RABBITMQ_HOST, port: int = Default.RABBITMQ_PORT):
+    def __init__(
+        self, host: str = Default.RABBITMQ_HOST, port: int = Default.RABBITMQ_PORT
+    ):
         """
         Init rabbitmq consumer
         :param host: rabbitmq host
@@ -22,10 +24,7 @@ class Consumer:
         """
         self.queue = Default.QUEUE
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(
-                host=host,
-                port=port,
-            )
+            pika.ConnectionParameters(host=host, port=port,)
         )
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.queue)
