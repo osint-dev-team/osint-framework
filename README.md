@@ -48,11 +48,11 @@ python3 cli.py -h
 
 To run the framework as a web service via docker and docker-compose:  
 ```bash
-make up
+make up_log
 ```
 or
 ```bash
-docker-compose up
+docker-compose up --scale consumer=5
 ```
 ## As a separated module
 Basic:
