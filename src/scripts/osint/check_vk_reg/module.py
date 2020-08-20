@@ -40,6 +40,11 @@ class Defaults:
 
 
 class Runner(OsintRunner):
+    """
+    Class that performs VK.com registration status (by phone number)
+    """
+    required = ["phone"]
+
     def __init__(self, logger: str = __name__) -> None:
         super(Runner, self).__init__(logger)
         self.__driver: webdriver = webdriver.Chrome(
