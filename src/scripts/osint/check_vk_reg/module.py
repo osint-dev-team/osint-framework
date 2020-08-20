@@ -40,12 +40,23 @@ class Defaults:
 
 
 class Runner(OsintRunner):
+    """
+    Class that performs VK.com registration status (by phone number)
+    """
+    required = ["phone"]
+
     def __init__(self, logger: str = __name__) -> None:
         super(Runner, self).__init__(logger)
-        self.__driver: webdriver = webdriver.Chrome(
-            executable_path=self.__get_driver_path(),
-            options=self.__get_driver_options(),
-        )
+        try:
+            self.__driver: webdriver = webdriver.Chrome(
+                executable_path=self.__get_driver_path(),
+                options=self.__get_driver_options(),
+            )
+        except:
+            self.__driver: webdriver = webdriver.Chrome(
+                executable_path="/usr/bin/chromedriver",
+                options=self.__get_driver_options(),
+            )
 
     @validate_kwargs(PossibleKeys.KEYS)
     def run(self, *args, **kwargs) -> ScriptResponse.success or ScriptResponse.error:
@@ -164,7 +175,9 @@ class Runner(OsintRunner):
 
         options: Options = webdriver.ChromeOptions()
         options.add_experimental_option("prefs", {"intl.accept_languages": "en,en_US"})
-        options.add_argument("headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--headless")
+        options.add_argument("--disable-gpu")
 
         return options
 
