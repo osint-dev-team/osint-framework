@@ -4,6 +4,7 @@ services:
   db:
     container_name: osint-framework-db
     image: postgres:alpine
+    restart: unless-stopped
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-osint_framework}
@@ -14,21 +15,63 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+    ports:
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres:/data/postgres
     networks:
       - postgres
-  server:
-    container_name: osint-framework-server
-    image: osint-framework-server:1.0
+  rabbitmq:
+    container_name: osint-framework-rabbitmq
+    image: rabbitmq:alpine
+    restart: unless-stopped
+    healthcheck:
+      test: nc -z localhost 5672
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "127.0.0.1:5672:5672"
+    networks:
+      - rabbitmq
+  consumer:
+    image: osint-framework-consumer:1.0
+    restart: on-failure
     depends_on:
       - db
+      - rabbitmq
     environment:
       POSTGRES_DATABASE: ${POSTGRES_DATABASE:-osint}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-osint_framework}
       POSTGRES_USER: ${POSTGRES_USER:-osint_framework}
       POSTGRES_HOST: ${POSTGRES_HOST:-osint-framework-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-osint-framework-rabbitmq}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      LOG_HANDLER: ${LOG_HANDLER:-stream}
+    build:
+      context: .
+      target: osint-framework-consumer
+      dockerfile: docker/consumer/Dockerfile
+    networks:
+      - postgres
+      - rabbitmq
+  server:
+    container_name: osint-framework-server
+    image: osint-framework-server:1.0
+    restart: on-failure
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-osint}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-osint_framework}
+      POSTGRES_USER: ${POSTGRES_USER:-osint_framework}
+      POSTGRES_HOST: ${POSTGRES_HOST:-osint-framework-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-osint-framework-rabbitmq}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      LOG_HANDLER: ${LOG_HANDLER:-stream}
     build:
       context: .
       target: osint-framework-server
@@ -42,8 +85,11 @@ services:
       - "8888:8888"
     networks:
       - postgres
+      - rabbitmq
 networks:
   postgres:
+    driver: bridge
+  rabbitmq:
     driver: bridge
 volumes:
     postgres:

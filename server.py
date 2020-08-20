@@ -5,19 +5,20 @@ Tornado-based server with REST API support
 """
 
 from abc import ABC
+from json import dumps
 from logging import DEBUG
 from typing import Any
 
 import tornado.log
 from tornado import httputil
 from tornado.escape import json_decode, json_encode
-from json import dumps
 from tornado.ioloop import IOLoop
 from tornado.options import parse_command_line
 from tornado.web import RequestHandler, Application
 
 from src.db.crud import TaskCrud
 from src.db.database import Engine, Base
+from src.queue.publisher import Publisher
 from src.server.handlers.task_spawner import TaskSpawner
 from src.server.structures.response import ServerResponse
 from src.server.structures.task import TaskItem
@@ -27,6 +28,9 @@ tornado.log.access_log.setLevel(DEBUG)
 
 # Define our logger
 logger = tornado.log.app_log
+
+# Initialize publisher
+publisher = Publisher()
 
 
 class BaseHandler(RequestHandler, ABC):
@@ -83,11 +87,43 @@ class CreateTaskHandler(BaseHandler, ABC):
         Handle task create process
         :return: task object
         """
+        execution_type = self.get_argument("type", default="queue")
         try:
             body = json_decode(self.request.body)
             task = TaskItem()
             TaskCrud.create_task(task=task)
-            TaskSpawner.run_task(task, body)
+            if execution_type == "process":
+                TaskSpawner.run_task(task, body)
+            elif execution_type == "queue":
+                publisher.publish_task(task=task, cases=body)
+            else:
+                return self.error(
+                    msg=f"Unsupported value for parameter 'type': {execution_type}. "
+                        f"Supported values: 'queue', 'process'"
+                )
+            response = json_encode(task.as_json())
+        except Exception as create_task_err:
+            return self.error(
+                msg=f"Unexpected error at task creating: {str(create_task_err)}"
+            )
+        self.write(response)
+
+
+class CreateTaskQueueHandler(BaseHandler, ABC):
+    """
+    Create basic task handler
+    """
+
+    def post(self):
+        """
+        Handle task create process
+        :return: task object
+        """
+        try:
+            body = json_decode(self.request.body)
+            task = TaskItem()
+            TaskCrud.create_task(task=task)
+            publisher.publish_task(task=task, cases=body)
             response = json_encode(task.as_json())
         except Exception as create_task_err:
             return self.error(
@@ -106,9 +142,9 @@ class ListTaskHandler(BaseHandler, ABC):
         Return tasks data
         :return: None
         """
+        task_id = self.get_argument("task_id", default=None)
+        limit = self.get_argument("limit", default=None)
         try:
-            task_id = self.get_argument("task_id", None)
-            limit = self.get_argument("limit", None)
             tasks = dumps(
                 TaskCrud.get_task(task_id)
                 if task_id
@@ -133,7 +169,7 @@ class ResultsHandler(BaseHandler, ABC):
         :return: None
         """
         try:
-            task_id = self.get_argument("task_id", None)
+            task_id = self.get_argument("task_id", default=None)
             results = json_encode(TaskCrud.get_results(task_id))
         except Exception as get_results_error:
             return self.error(
@@ -180,6 +216,12 @@ if __name__ == "__main__":
     # Create application
     app = make_app()
     app.listen(port=8888)
+
+    # Init rabbitmq queue polling
+    polling = tornado.ioloop.PeriodicCallback(
+        lambda: publisher.process_data_events(), 1000
+    )
+    polling.start()
 
     # Here we go!
     logger.info(msg="Server successfully started. Wait for incoming connections.")
