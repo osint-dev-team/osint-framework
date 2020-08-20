@@ -40,6 +40,11 @@ services:
     depends_on:
       - db
       - rabbitmq
+    healthcheck:
+      test: nc -z osint-framework-rabbitmq 5672
+      interval: 30s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_DATABASE: ${POSTGRES_DATABASE:-osint}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-osint_framework}
