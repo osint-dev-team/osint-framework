@@ -35,7 +35,7 @@ def retry(retries: int = 5) -> callable:
                 try:
                     return function(*args, **kwargs)
                 except exc.DBAPIError:
-                    sleep(0.5*attempt)
+                    sleep(0.5 * attempt)
                     continue
             return function(*args, **kwargs)
 

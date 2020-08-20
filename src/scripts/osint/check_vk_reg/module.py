@@ -43,6 +43,7 @@ class Runner(OsintRunner):
     """
     Class that performs VK.com registration status (by phone number)
     """
+
     required = ["phone"]
 
     def __init__(self, logger: str = __name__) -> None:
@@ -158,7 +159,11 @@ class Runner(OsintRunner):
         path: str = str(
             Path(__file__).parent.parent.parent.parent
             / "drivers"
-            / ("chromedriver_" + system + ".exe" if system == "windows" else "chromedriver_" + system)
+            / (
+                "chromedriver_" + system + ".exe"
+                if system == "windows"
+                else "chromedriver_" + system
+            )
         )
 
         self.__set_execution_rights(path)

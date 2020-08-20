@@ -10,6 +10,7 @@ class Runner(ReconRunner):
     """
     Simple example module to returh headers
     """
+
     required = ["hostname"]
 
     def __init__(self, logger: str = __name__):

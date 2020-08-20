@@ -19,7 +19,9 @@ class TestDefaults:
     PORT_RANGE = (20_000, 65_535)
     PORT = None
 
-    def __init__(self, host: str or None = None, down_timeout: float or None = None) -> None:
+    def __init__(
+        self, host: str or None = None, down_timeout: float or None = None
+    ) -> None:
         """
         Init random port
         :param host: host to set

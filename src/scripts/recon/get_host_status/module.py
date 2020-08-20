@@ -10,6 +10,7 @@ class Runner(ReconRunner):
     """
     Class that performs host status check
     """
+
     required = ["url"]
 
     def __init__(self, logger: str = __name__):

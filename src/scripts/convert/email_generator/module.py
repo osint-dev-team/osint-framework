@@ -51,6 +51,7 @@ class Runner(BaseRunner):
     """
     Class that generates different email addresses
     """
+
     required = ["username"]
 
     def __init__(self, logger: str = __name__):

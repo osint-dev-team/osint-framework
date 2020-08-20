@@ -11,6 +11,7 @@ class Runner(OsintRunner):
     """
     Class that performs region check by phone number
     """
+
     required = ["phone"]
 
     def __init__(self, logger: str = __name__):

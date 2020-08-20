@@ -17,3 +17,4 @@ tests:
 
 clean:
 	docker-compose down
+	docker volume rm osint-framework_postgres -f

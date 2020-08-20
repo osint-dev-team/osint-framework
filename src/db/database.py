@@ -24,7 +24,8 @@ Engine = create_engine(
     f"postgres+psycopg2://"
     f"{DefaultValues.POSTGRES_USER}:{DefaultValues.POSTGRES_PASSWORD}@"
     f"{DefaultValues.POSTGRES_HOST}:{str(DefaultValues.POSTGRES_PORT)}/"
-    f"{DefaultValues.POSTGRES_DATABASE}", poolclass=NullPool
+    f"{DefaultValues.POSTGRES_DATABASE}",
+    poolclass=NullPool,
 )
 if not database_exists(Engine.url):
     create_database(Engine.url)
