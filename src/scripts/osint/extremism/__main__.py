@@ -6,7 +6,5 @@ from sys import argv
 from src.core.utils.module import run_module
 from .module import Runner
 
-result = run_module(
-    Runner, args=argv, arg_name="fullname", arg_default="ИВАНОВ ИВАН ИВАНОВИЧ"
-)
+result = run_module(Runner, args=argv, arg_name="fullname", arg_default="ПЕТРОВ")
 pprint(result)

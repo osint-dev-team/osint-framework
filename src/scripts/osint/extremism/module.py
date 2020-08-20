@@ -4,11 +4,15 @@ from src.core.base.osint import OsintRunner, PossibleKeys
 from src.core.utils.response import ScriptResponse
 from src.core.utils.validators import validate_kwargs
 from requests import get
-from bs4 import BeautifulSoup
-from re import search
+from re import findall
 
 
 class Runner(OsintRunner):
+    """
+    Class that performs Russian Extremists list check
+    """
+    required = ["fullname"]
+
     def __init__(self, logger: str = __name__):
         super(Runner, self).__init__(logger)
 
@@ -23,30 +27,12 @@ class Runner(OsintRunner):
         if response.status_code != 200:
             return ScriptResponse.error(
                 result="Couldn't run the script",
-                message="Extremists name base was not available",
+                message="Extremists name base is not available",
             )
-        soup = BeautifulSoup(response.text, "html.parser")
-        russians = soup.find_all(name="ol", attrs={"class": "terrorist-list"})[
-            3
-        ].find_all(name="li")
-        foreigners = soup.find_all(name="ol", attrs={"class": "terrorist-list"})[
-            1
-        ].find_all(name="li")
-        persons = russians + foreigners
-        totalOccurrences = list(
-            map(
-                lambda tag: tag.string,
-                filter(
-                    lambda person: search(
-                        r"[0-9]+\. " + fullname.upper(), person.string
-                    ),
-                    persons,
-                ),
-            )
-        )
+        occurences = findall(rf"<li>\d+\. ({fullname.upper()}.*);</li>", response.text)
         return ScriptResponse.success(
-            result={"found": bool(totalOccurrences), "occurrences": totalOccurrences},
-            message="Person was found on the Russian extremist list"
-            if bool(totalOccurrences)
-            else "Person was not found on the Russian extremist list",
+            result={"found": bool(occurences), "occurrences": occurences},
+            message="Person found on the Russian extremists list"
+            if bool(occurences)
+            else "Person not found on the Russian extremists list",
         )

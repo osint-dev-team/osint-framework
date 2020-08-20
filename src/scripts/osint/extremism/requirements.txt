@@ -1,8 +1,10 @@
-beautifulsoup4==4.9.1
-bs4==0.0.1
 certifi==2020.6.20
 chardet==3.0.4
+colorama==0.4.3
+commonmark==0.9.1
 idna==2.10
+Pygments==2.6.1
 requests==2.24.0
-soupsieve==2.0.1
+rich==5.2.0
+typing-extensions==3.7.4.2
 urllib3==1.25.10
