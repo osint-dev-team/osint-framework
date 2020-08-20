@@ -89,13 +89,13 @@ class Runner(ReconRunner):
         try:
             ip = self.__validate_ip(kwargs.get("ip"))
         except ValueError:
-            return ScriptResponse.error(message="Invalid IP address.")
+            return ScriptResponse.error(message="Invalid IP address")
 
         try:
             rdap = IPWhois(ip).lookup_rdap()
         except Exception as e:
             return ScriptResponse.error(
-                message="RDAP lookup failed. Unknown error occurred: " + str(e)
+                message=f"RDAP lookup failed. Unknown error occurred: {str(e)}"
             )
 
         # notices and remarks sections contains some useless info, let's get rid of it
@@ -108,7 +108,7 @@ class Runner(ReconRunner):
         # entities section contains objects section keys, so we don't need it
         rdap.pop("entities", None)
 
-        return ScriptResponse.success(result=rdap, message="RDAP lookup successful.")
+        return ScriptResponse.success(result=rdap, message="RDAP lookup successful")
 
     @staticmethod
     def __validate_ip(ip: str):
@@ -125,4 +125,4 @@ class Runner(ReconRunner):
         try:
             return str(ipaddress.ip_address(ip))
         except ValueError as err:
-            raise ValueError("Invalid IP address!") from err
+            raise ValueError("Invalid IP address") from err
