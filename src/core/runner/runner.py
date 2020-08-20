@@ -119,7 +119,7 @@ class ScriptRunner:
         max_workers: int = CoreDefaults.MAX_THREADS,
         timeout: int = CoreDefaults.CASE_TIMEOUT,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         Run a category with scripts
@@ -132,7 +132,9 @@ class ScriptRunner:
             self.get_scripts()
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {
-                executor.submit(self.exec_script, path=script, args=args, kwargs=kwargs): sleep(0.1)
+                executor.submit(
+                    self.exec_script, path=script, args=args, kwargs=kwargs
+                ): sleep(0.1)
                 for script in self.scripts.get(category, [])
             }
         try:

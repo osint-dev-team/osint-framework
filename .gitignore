@@ -2,6 +2,7 @@
 .idea/
 .DS_Store
 results/*.json
+src/drivers/chromedriver_*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

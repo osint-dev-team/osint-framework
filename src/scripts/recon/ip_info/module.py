@@ -13,6 +13,7 @@ class Runner(ReconRunner):
     """
     Class that performs IP information check
     """
+
     required = ["ip"]
 
     def __init__(self, logger: str = __name__) -> None:
