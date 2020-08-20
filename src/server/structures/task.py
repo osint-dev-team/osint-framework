@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
+from typing import Union
 from uuid import uuid4
 
 
@@ -31,9 +32,9 @@ class TaskItem:
         self,
         status: str = TaskStatus.PENDING,
         message: str = DefaultValues.EMPTY,
-        task_id: uuid4 = uuid4,
-        datetime_start: datetime = None,
-        datetime_finish: datetime or None = None,
+        task_id: Union[uuid4, str] = uuid4,
+        datetime_start: Union[datetime, str, None] = None,
+        datetime_finish: Union[datetime, str, None] = None,
     ):
         """
         Define basic structure
@@ -50,9 +51,13 @@ class TaskItem:
         """
         self.status = status
         self.message = message
-        self.task_id = str(task_id())
-        self.datetime_start = datetime_start if datetime_start else datetime.now()
-        self.datetime_finish = datetime_finish
+        self.task_id = str(task_id()) if not isinstance(task_id, str) else task_id
+        self.datetime_start = datetime.strptime(
+            datetime_start, "%Y-%m-%d %H:%M:%S.%f"
+        ) if isinstance(datetime_start, str) else datetime.now()
+        self.datetime_finish = datetime.strptime(
+            datetime_finish, "%Y-%m-%d %H:%M:%S.%f"
+        ) if isinstance(datetime_finish, str) else datetime_finish
 
     def __repr__(self) -> str:
         """
