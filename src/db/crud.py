@@ -24,7 +24,7 @@ def object_as_dict(obj):
 
 def retry(retries: int = 5) -> callable:
     """
-    Retry query if error
+    Retry query if error happened
     :param retries: quantity of retries
     :return: result
     """
