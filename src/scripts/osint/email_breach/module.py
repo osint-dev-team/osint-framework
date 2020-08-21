@@ -34,7 +34,7 @@ class Runner(OsintRunner):
         Take email and look it up in breaches.
         Breaches info is provided by monitor.firefox.com (haveibeenpwned.com)
         """
-        email = "" # kwargs.get("email")
+        email = kwargs.get("email")
         if not isinstance(email, str):
             return ScriptResponse.error(
                 result=None,
