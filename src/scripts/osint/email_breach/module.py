@@ -11,15 +11,18 @@ from src.core.utils.validators import validate_kwargs
 
 
 class Defaults:
-    headers = {"Content-Type": "application/x-www-form-urlencoded",
-               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
-                             " Chrome/84.0.4147.105 Safari/537.36"}
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
+        " Chrome/84.0.4147.105 Safari/537.36",
+    }
 
 
 class Runner(OsintRunner):
     """
     Check email in public breaches.
     """
+
     required = ["email"]
 
     def __init__(self, logger: str = __name__):
@@ -31,7 +34,12 @@ class Runner(OsintRunner):
         Take email and look it up in breaches.
         Breaches info is provided by monitor.firefox.com (haveibeenpwned.com)
         """
-        email = kwargs.get("email")
+        email = "" # kwargs.get("email")
+        if not isinstance(email, str):
+            return ScriptResponse.error(
+                result=None,
+                message=f"Can't make query. Incorrect input type (got {type(email)}, need {type('')}).",
+            )
         email_hash = sha1(email.encode()).hexdigest()
 
         session = Session()
@@ -46,13 +54,10 @@ class Runner(OsintRunner):
 
         csrf_re = findall(r'(?<="_csrf" value=").*(?=">)', resp.text)
         if len(csrf_re) == 0:
-            return ScriptResponse.error(
-                result=None,
-                message=f"Can't find csrf token."
-            )
+            return ScriptResponse.error(result=None, message=f"Can't find csrf token.")
         csrf = csrf_re[0]
 
-        data = {"_csrf": csrf, 'emailHash': email_hash}
+        data = {"_csrf": csrf, "emailHash": email_hash}
         resp = session.post(r"https://monitor.firefox.com/scan", data=data)
         if resp.status_code != 200:
             return ScriptResponse.success(
@@ -63,12 +68,17 @@ class Runner(OsintRunner):
         session.close()
 
         breaches = []
-        soup = BeautifulSoup(resp.text, 'lxml')
+        soup = BeautifulSoup(resp.text, "html.parser")
         for breach in soup.find_all("a", class_="breach-card"):
             title = breach.find("span", class_="breach-title").text
-            breaches.append({'title': title})
+            info = breach.find_all("span", class_="breach-value")
+            if len(info) != 2:
+                continue
+            breaches.append(
+                {"title": title, "date": info[0].text, "compromised": info[1].text}
+            )
 
         return ScriptResponse.success(
             result=breaches,
-            message=f"Email is found in {len(breaches)} breaches.",
+            message=f"Email {email} is found in {len(breaches)} breaches.",
         )
