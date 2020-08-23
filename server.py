@@ -22,6 +22,8 @@ from src.queue.publisher import Publisher
 from src.server.handlers.task_spawner import TaskSpawner
 from src.server.structures.response import ServerResponse
 from src.server.structures.task import TaskItem
+from src.server.structures.task import TaskStatus
+from src.cache.redis import RedisCache
 
 # Set logging level for Tornado Server
 tornado.log.access_log.setLevel(DEBUG)
@@ -31,6 +33,9 @@ logger = tornado.log.app_log
 
 # Initialize publisher
 publisher = Publisher()
+
+# Initialize redis
+redis = RedisCache()
 
 
 class BaseHandler(RequestHandler, ABC):
@@ -170,12 +175,26 @@ class ResultsHandler(BaseHandler, ABC):
         """
         try:
             task_id = self.get_argument("task_id", default=None)
-            results = json_encode(TaskCrud.get_results(task_id))
+            redis_cache = redis.get(task_id)
+            # If cache is available - write cache as response
+            if redis_cache:
+                logger.info(msg=f"Redis cache is available, task {task_id}")
+                return self.write(redis_cache)
+            # If cache is not available - get results from the database
+            db_results = TaskCrud.get_results(task_id)
+            json_results = dumps(db_results, default=str)
+            # If status is 'pending' (in progress), skip cache saving, write database results
+            if db_results.get("task", {}).get("status", "") == TaskStatus.PENDING:
+                logger.info(msg=f"Status of task {task_id} is '{TaskStatus.PENDING}', skip Redis results saving")
+                return self.write(json_results)
+            # If status is 'error' or 'success' (finished), save the cache and write database results
+            redis.set(key=task_id, value=json_results)
+            logger.info(msg=f"Save results to Redis, task {task_id}")
+            return self.write(json_results)
         except Exception as get_results_error:
             return self.error(
                 msg=f"Unexpected error at getting results: {str(get_results_error)}"
             )
-        self.write(results)
 
 
 class HealthCheckHandler(BaseHandler, ABC):

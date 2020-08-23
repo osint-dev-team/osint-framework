@@ -60,12 +60,13 @@ class Publisher:
             body=dumps({"task": task.as_json(), "cases": cases}),
         )
 
-    def process_data_events(self) -> None:
+    def process_data_events(self, time_limit: int = 1) -> None:
         """
         Process data events
+        :param time_limit: limit time of processing (in seconds)
         :return: None
         """
-        self.connection.process_data_events(time_limit=1)
+        self.connection.process_data_events(time_limit=time_limit)
 
     def __del__(self):
         """

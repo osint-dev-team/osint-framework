@@ -43,17 +43,14 @@ class Consumer:
         cases = raw_body.get("cases", {})
         task = TaskItem(**raw_body.get("task", {}))
 
-        done_tasks = 0
-        cases_len = len(cases)
-        for result in self.manager.multi_case_runner(cases=cases):
-            done_tasks += 1
-            TaskCrud.create_task_result(task, result or {})
-            message = f"Done {done_tasks} out of {cases_len} cases"
-            task.set_pending(message)
-            logger.info(message)
-            TaskCrud.update_task(task)
+        try:
+            results = list(self.manager.multi_case_runner(cases=cases))
+            for result in results:
+                TaskCrud.create_task_result(task, result or {})
+            task.set_success(msg=f"Task done: {len(results)} out of {len(cases)} cases")
+        except Exception as cases_err:
+            task.set_error(msg=f"Task error: {str(cases_err)}")
 
-        task.set_success(msg=f"All cases done ({done_tasks} out of {cases_len})")
         TaskCrud.update_task(task)
         logger.info(msg=f"Done task {task.task_id}")
 
