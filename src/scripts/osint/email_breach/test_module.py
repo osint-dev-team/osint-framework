@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from unittest import TestCase
+from unittest import TestCase, SkipTest
 from random import seed, choice
 from string import ascii_uppercase
 
@@ -35,6 +35,9 @@ class EmailBreachTest(TestCase):
         :return: None
         """
         response = self.runner.run(email="johndoe@gmail.com")
+        if "429" in response.get("message", ""):
+            raise SkipTest("Server respond with 429 (Too many requests)")
+
         self.assertIn("found in", response.get("message"))
         self.assertGreaterEqual(len(response.get("result")), 10)
         self.assertIn(
@@ -52,6 +55,8 @@ class EmailBreachTest(TestCase):
         """
         request = get_random_string(30)
         response = self.runner.run(email=request)
+        if "429" in response.get("message", ""):
+            raise SkipTest("Server respond with 429 (Too many requests)")
         self.assertIn("found in", response.get("message"))
 
     def test_unexpected_input(self) -> None:
@@ -59,4 +64,6 @@ class EmailBreachTest(TestCase):
         Test email breach on unexpected input type
         """
         response = self.runner.run(email=None)
+        if "429" in response.get("message", ""):
+            raise SkipTest("Server respond with 429 (Too many requests)")
         self.assertIn("Can't make query", response.get("message"))
