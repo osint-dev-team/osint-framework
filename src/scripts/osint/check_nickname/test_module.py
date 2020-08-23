@@ -32,7 +32,9 @@ class NicknameCheckTest(TestCase):
         response = self.runner.run(username="")
         self.assertEqual(response.get("status"), "success")
         for _ in range(5):
-            nickname = "".join(choice(string.ascii_letters) for _ in range(randrange(5, 10)))
+            nickname = "".join(
+                choice(string.ascii_letters) for _ in range(randrange(5, 10))
+            )
             response = self.runner.run(username=nickname)
             self.assertEqual(response.get("status"), "success")
 
@@ -45,6 +47,8 @@ class NicknameCheckTest(TestCase):
         response = self.runner.run(username=None)
         self.assertEqual(response.get("status"), "error")
         for _ in range(5):
-            nickname = "".join(choice(string.punctuation) for _ in range(randrange(3, 5)))
+            nickname = "".join(
+                choice(string.punctuation) for _ in range(randrange(3, 5))
+            )
             response = self.runner.run(username=nickname)
             self.assertEqual(response.get("status"), "error")

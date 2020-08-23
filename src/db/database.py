@@ -6,6 +6,7 @@ Define basic values
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
 from os import environ
@@ -23,7 +24,8 @@ Engine = create_engine(
     f"postgres+psycopg2://"
     f"{DefaultValues.POSTGRES_USER}:{DefaultValues.POSTGRES_PASSWORD}@"
     f"{DefaultValues.POSTGRES_HOST}:{str(DefaultValues.POSTGRES_PORT)}/"
-    f"{DefaultValues.POSTGRES_DATABASE}"
+    f"{DefaultValues.POSTGRES_DATABASE}",
+    poolclass=NullPool,
 )
 if not database_exists(Engine.url):
     create_database(Engine.url)

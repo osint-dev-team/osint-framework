@@ -28,7 +28,9 @@ class CaseManager:
         "default": BaseCase,
     }
 
-    def __init__(self, cases: list or None = None, max_workers: int = CoreDefaults.MAX_PROCESSES):
+    def __init__(
+        self, cases: list or None = None, max_workers: int = CoreDefaults.MAX_PROCESSES
+    ):
         """
         Init manager
         :param cases: cases to run
@@ -63,10 +65,7 @@ class CaseManager:
             "case_class": self.MAPPING.get(case_class, "default").__name__,
             "case_name": case_name,
             "case_description": case_description,
-            "case_data": {
-                "args": args,
-                "kwargs": kwargs
-            },
+            "case_data": {"args": args, "kwargs": kwargs},
             "case_results": case.get_results() or {},
         }
 
@@ -93,7 +92,8 @@ class CaseManager:
                     case_description=case.get("description"),
                     *case.get("args", []),
                     **case.get("kwargs", {}),
-                ): sleep(0.1) for case in cases
+                ): sleep(1.0)
+                for case in cases
             }
         for future in as_completed(futures):
             yield future.result()
