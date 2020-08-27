@@ -118,7 +118,7 @@ class TaskCrud:
 
     @staticmethod
     @retry()
-    def get_results(task_id: str, db: Session = SessionLocal()) -> {}:
+    def get_results(task_id: str, db: Session = SessionLocal()) -> dict:
         """
         Return results
         :param task_id: task id to use

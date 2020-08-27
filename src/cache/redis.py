@@ -11,7 +11,11 @@ class DefaultValues:
 
 
 class RedisCache:
-    def __init__(self, host: str = DefaultValues.REDIS_HOST, timeout: int = DefaultValues.REDIS_TIMEOUT):
+    def __init__(
+        self,
+        host: str = DefaultValues.REDIS_HOST,
+        timeout: int = DefaultValues.REDIS_TIMEOUT,
+    ):
         self.options = dict(timeout=timeout)
         self.redis = Redis(host=host)
 
