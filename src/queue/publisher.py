@@ -2,7 +2,9 @@
 
 from json import dumps
 
-import pika
+from pika import BlockingConnection, ConnectionParameters
+from pika.adapters.blocking_connection import BlockingChannel
+from pika.spec import Basic, BasicProperties
 
 from src.core.utils.log import Logger
 from src.queue.defaults import DefaultValues as Default
@@ -13,36 +15,52 @@ logger = Logger.get_logger(name=__name__)
 
 class Publisher:
     def __init__(
-        self, host: str = Default.RABBITMQ_HOST, port: int = Default.RABBITMQ_PORT
+        self,
+        host: str = Default.RABBITMQ_HOST,
+        port: int = Default.RABBITMQ_PORT,
+        task_queue: str = Default.TASK_QUEUE,
+        response_queue: str = Default.RESPONSE_QUEUE,
     ):
         """
         Init rabbitmq publisher
         :param host: rabbitmq host
         :param port: rabbitmq port
+        :param task_queue: queue name
+        :param response_queue: response queue name
         """
-        self.queue = Default.QUEUE
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=host, port=port,)
+        self.task_queue_name = task_queue
+        self.response_queue_name = response_queue
+
+        self.connection = BlockingConnection(
+            ConnectionParameters(host=host, port=port,)
         )
         self.channel = self.connection.channel()
-        result = self.channel.queue_declare(queue="", exclusive=True)
-        self.callback_queue = result.method.queue
+
+        self.task_queue = self.channel.queue_declare(queue=self.task_queue_name)
+        self.response_queue = self.channel.queue_declare(queue=self.response_queue_name, exclusive=True)
+
         self.channel.basic_consume(
-            queue=self.callback_queue,
-            on_message_callback=self.on_response,
+            queue=self.response_queue_name,
+            on_message_callback=self.task_response,
             auto_ack=True,
         )
 
-    def on_response(self, ch, method, props, body) -> None:
+    @staticmethod
+    def task_response(
+        channel: BlockingChannel,
+        method: Basic.Deliver,
+        properties: BasicProperties,
+        body: bytes,
+    ) -> None:
         """
         Process tasks response
-        :param ch: channel
+        :param channel: channel
         :param method: method
-        :param props: task properties
+        :param properties: task properties
         :param body: task body
         :return: None
         """
-        logger.info(msg=f"Done task {props.correlation_id}")
+        logger.info(msg=f"Done task {properties.correlation_id}")
 
     def publish_task(self, task: TaskItem, cases: list) -> None:
         """
@@ -51,13 +69,20 @@ class Publisher:
         :param cases: list of cases
         :return: None
         """
+        task_body = dumps(
+            {
+                "task": task.as_json(),
+                "cases": cases
+            }
+        ).encode(encoding="utf-8")
+
         self.channel.basic_publish(
             exchange="",
-            routing_key=self.queue,
-            properties=pika.BasicProperties(
-                reply_to=self.callback_queue, correlation_id=task.task_id,
+            routing_key=self.task_queue_name,
+            properties=BasicProperties(
+                reply_to=self.response_queue_name, correlation_id=task.task_id,
             ),
-            body=dumps({"task": task.as_json(), "cases": cases}),
+            body=task_body,
         )
 
     def process_data_events(self, time_limit: int = 1) -> None:
@@ -66,6 +91,11 @@ class Publisher:
         :param time_limit: limit time of processing (in seconds)
         :return: None
         """
+        logger.info(
+            msg=f"Check for new events: "
+                f"{self.task_queue.method.message_count} tasks in queue, "
+                f"{self.response_queue.method.message_count} responses in queue"
+        )
         self.connection.process_data_events(time_limit=time_limit)
 
     def __del__(self):

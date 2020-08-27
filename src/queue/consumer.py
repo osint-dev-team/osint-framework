@@ -2,7 +2,9 @@
 
 from json import loads, dumps
 
-import pika
+from pika import BlockingConnection, ConnectionParameters
+from pika.adapters.blocking_connection import BlockingChannel
+from pika.spec import Basic, BasicProperties
 
 from src.core.runner.manager import CaseManager
 from src.core.utils.log import Logger
@@ -15,31 +17,45 @@ logger = Logger.get_logger(name=__name__)
 
 class Consumer:
     def __init__(
-        self, host: str = Default.RABBITMQ_HOST, port: int = Default.RABBITMQ_PORT
+        self,
+        host: str = Default.RABBITMQ_HOST,
+        port: int = Default.RABBITMQ_PORT,
+        task_queue: str = Default.TASK_QUEUE
     ):
         """
         Init rabbitmq consumer
         :param host: rabbitmq host
         :param port: rabbitmq port
+        :param task_queue: queue name
         """
-        self.queue = Default.QUEUE
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=host, port=port,)
+        self.connection = BlockingConnection(
+            ConnectionParameters(host=host, port=port,)
         )
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.queue)
+        self.channel.queue_declare(queue=task_queue)
+        self.channel.basic_consume(
+            queue=task_queue,
+            on_message_callback=self.task_process,
+        )
+
         self.manager = CaseManager()
 
-    def callback(self, ch, method, properties, body) -> None:
+    def task_process(
+        self,
+        channel: BlockingChannel,
+        method: Basic.Deliver,
+        properties: BasicProperties,
+        body: bytes
+    ) -> None:
         """
         Process the received task
-        :param ch: channel
+        :param channel: channel
         :param method: method
         :param properties: task properties
         :param body: task body
         :return: None
         """
-        raw_body = loads(body)
+        raw_body = loads(body.decode(encoding="utf-8"))
         cases = raw_body.get("cases", {})
         task = TaskItem(**raw_body.get("task", {}))
 
@@ -54,20 +70,19 @@ class Consumer:
         TaskCrud.update_task(task)
         logger.info(msg=f"Done task {task.task_id}")
 
-        ch.basic_publish(
+        channel.basic_publish(
             exchange="",
             routing_key=properties.reply_to,
-            properties=pika.BasicProperties(correlation_id=properties.correlation_id),
-            body=dumps(task.as_json()),
+            properties=BasicProperties(correlation_id=properties.correlation_id),
+            body=dumps(task.as_json()).encode(encoding="utf-8"),
         )
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+        channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def start_consuming(self) -> None:
         """
         Run consumer
         :return: None
         """
-        self.channel.basic_consume(queue=self.queue, on_message_callback=self.callback)
         self.channel.start_consuming()
 
     def __del__(self):
