@@ -1,20 +1,29 @@
 #!/usr/bin/env python3
 
 from unittest import TestCase, SkipTest
-from random import seed, choice
+from random import choices
 from string import ascii_uppercase
 
 from .module import Runner
 
 
-def get_random_string(length: int) -> str:
+def get_random_string(length: int = 30) -> str:
     """
     Generates random string.
+    :param length: string length
+    :return: random string
     """
-    seed()
-    letters = ascii_uppercase
-    string = "".join(choice(letters) for i in range(length))
-    return string
+    return "".join(choices(ascii_uppercase, k=length))
+
+
+def check_response_msg(message: str = "") -> None:
+    """
+    Check that response message is valid and applicable
+    :param message: message of the response
+    :return: None
+    """
+    if "429" in message:
+        raise SkipTest("Server respond with 429 (Too many requests)")
 
 
 class EmailBreachTest(TestCase):
@@ -35,8 +44,7 @@ class EmailBreachTest(TestCase):
         :return: None
         """
         response = self.runner.run(email="johndoe@gmail.com")
-        if "429" in response.get("message", ""):
-            raise SkipTest("Server respond with 429 (Too many requests)")
+        check_response_msg(response.get("message", ""))
 
         self.assertIn("found in", response.get("message"))
         self.assertGreaterEqual(len(response.get("result")), 10)
@@ -53,10 +61,8 @@ class EmailBreachTest(TestCase):
         """
         Test email breach on random string request.
         """
-        request = get_random_string(30)
-        response = self.runner.run(email=request)
-        if "429" in response.get("message", ""):
-            raise SkipTest("Server respond with 429 (Too many requests)")
+        response = self.runner.run(email=get_random_string())
+        check_response_msg(response.get("message", ""))
         self.assertIn("found in", response.get("message"))
 
     def test_unexpected_input(self) -> None:
@@ -64,6 +70,5 @@ class EmailBreachTest(TestCase):
         Test email breach on unexpected input type
         """
         response = self.runner.run(email=None)
-        if "429" in response.get("message", ""):
-            raise SkipTest("Server respond with 429 (Too many requests)")
+        check_response_msg(response.get("message", ""))
         self.assertIn("Can't make query", response.get("message"))
