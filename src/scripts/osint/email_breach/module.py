@@ -48,16 +48,13 @@ class Runner(OsintRunner):
 
             resp = session.get(r"https://monitor.firefox.com")
             if resp.status_code != 200:
-                return ScriptResponse.success(
-                    result=None,
+                return ScriptResponse.error(
                     message=f"Can't look up email in breaches. Server response: {resp.status_code}.",
                 )
 
             csrf_re = findall(r'(?<="_csrf" value=").*(?=">)', resp.text)
             if not csrf_re:
-                return ScriptResponse.error(
-                    result=None, message=f"Can't find csrf token."
-                )
+                return ScriptResponse.error(message=f"Can't find csrf token.")
 
             csrf = csrf_re[0]
             resp = session.post(
@@ -65,8 +62,7 @@ class Runner(OsintRunner):
                 data={"_csrf": csrf, "emailHash": email_hash},
             )
             if resp.status_code != 200:
-                return ScriptResponse.success(
-                    result=None,
+                return ScriptResponse.error(
                     message=f"Can't look up email in breaches. Server response: {resp.status_code}.",
                 )
 
