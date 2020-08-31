@@ -21,6 +21,17 @@ services:
       - postgres:/data/postgres
     networks:
       - postgres
+  redis:
+    container_name: osint-framework-redis
+    image: redis:alpine
+    healthcheck:
+      test: redis-cli ping
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - redis
+    restart: unless-stopped
   rabbitmq:
     container_name: osint-framework-rabbitmq
     image: rabbitmq:alpine
@@ -76,6 +87,7 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       RABBITMQ_HOST: ${RABBITMQ_HOST:-osint-framework-rabbitmq}
       RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      REDIS_HOST: ${REDIS_HOST-osint-framework-redis}
       LOG_HANDLER: ${LOG_HANDLER:-stream}
     build:
       context: .
@@ -91,10 +103,13 @@ services:
     networks:
       - postgres
       - rabbitmq
+      - redis
 networks:
   postgres:
     driver: bridge
   rabbitmq:
+    driver: bridge
+  redis:
     driver: bridge
 volumes:
     postgres:
