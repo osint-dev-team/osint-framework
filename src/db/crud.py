@@ -118,25 +118,28 @@ class TaskCrud:
 
     @staticmethod
     @retry()
-    def get_results(task_id: str, db: Session = SessionLocal()) -> list:
+    def get_results(task_id: str, db: Session = SessionLocal()) -> dict:
         """
         Return results
         :param task_id: task id to use
         :param db: database to use
         :return: dict
         """
+        # fmt: off
         try:
-            results = (
-                db.query(models.Result).filter(models.Result.owner_id == task_id).all()
-            )
+            db_results = db.query(models.Result).filter(models.Result.owner_id == task_id).all()
+            db_task_status = db.query(models.Task).filter_by(task_id=task_id).first()
         except exc.DBAPIError as api_err:
             raise api_err from api_err
         except:
-            return []
+            return {}
         else:
-            return [loads(str(data.result)) for data in results]
+            results = [loads(str(data.result)) for data in db_results]
+            task_status = object_as_dict(db_task_status)
+            return {"task": task_status, "results": results}
         finally:
             db.close()
+        # fmt: on
 
     @staticmethod
     @retry()
@@ -164,7 +167,7 @@ class TaskCrud:
     @retry()
     def get_task(task_id: str, db: Session = SessionLocal()) -> dict:
         """
-        Return task results by UUID
+        Return task status by UUID
         :param task_id: task id to use
         :param db: database to use
         :return: dict
