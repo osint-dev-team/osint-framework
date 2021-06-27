@@ -23,10 +23,38 @@
 
 
 ## Installing
+### General
 ```bash
 virtualenv -p python3 venv (or python3 -m venv venv)
 source venv/bin/activate
+# see "macOS Prerequisites" if required
 pip3 install -r requirements.txt
+```
+### macOS Prerequisites
+For macOS, additional pre-steps after venv activation are required. Install postgresql and cryptographic dependencies:  
+```bash
+brew install postgresql pkg-config libffi
+brew link openssl
+```
+Set the following paths based on the "link" command output and libffi installation notes:  
+```bash
+For compilers to find openssl@1.1 you may need to set:
+  export LDFLAGS="-L/usr/local/opt/openssl@1.1/lib"
+  export CPPFLAGS="-I/usr/local/opt/openssl@1.1/include"
+```
+```bash
+For compilers to find libffi you may need to set:
+  export LDFLAGS="-L/usr/local/opt/libffi/lib"
+  export CPPFLAGS="-I/usr/local/opt/libffi/include"
+```
+You need to combine these flags together and execute the following commands:
+```bash
+export LDFLAGS="-L/usr/local/opt/openssl@1.1/lib -L/usr/local/opt/libffi/lib"
+export CPPFLAGS="-I/usr/local/opt/openssl@1.1/include -I/usr/local/opt/libffi/include"
+```
+Also, install `wheel` to build `pycares` in the `venv` environment:
+```
+pip3 install wheel
 ```
 
 ## Testing
